@@ -5,12 +5,12 @@ extends RigidBody2D
 
 func _ready():
 	# Add microscopic randomness to simulate real-world variations
-	# This is critical for proper Galton board distribution
-	var tiny_random = randf_range(-0.5, 0.5)
+	# This ensures each ball takes a unique path through pins
+	var tiny_random = randf_range(-1.0, 1.0)
 	linear_velocity = Vector2(tiny_random, 0)
 
-	# Also add tiny rotation for extra chaos
-	angular_velocity = randf_range(-0.1, 0.1)
+	# Tiny rotation helps with pin collision variation
+	angular_velocity = randf_range(-0.2, 0.2)
 
 func remove():
 	# Use deferred call to avoid physics errors

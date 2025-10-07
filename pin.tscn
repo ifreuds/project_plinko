@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://qt7whkffu0k5" path="res://icon.svg" id="2_gflbs"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h4t62"]
-friction = 0.3
-bounce = 0.15
+friction = 0.9
+bounce = 0.05
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sw3mb"]
 radius = 10.0
