@@ -5,8 +5,13 @@ signal ball_scored(slot_number)
 @export var slot_number: int = 0
 var ball_count: int = 0
 
+@onready var label = $Label
+
 func _ready():
 	body_entered.connect(_on_body_entered)
+	# Update label to show slot number
+	if label:
+		label.text = str(slot_number)
 
 func _on_body_entered(body):
 	if body.has_method("remove"):

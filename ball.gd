@@ -9,4 +9,5 @@ func _ready():
 	linear_velocity = Vector2(random_push, 0)
 
 func remove():
-	queue_free()
+	# Use deferred call to avoid physics errors
+	call_deferred("queue_free")
