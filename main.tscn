@@ -1,0 +1,225 @@
+[gd_scene load_steps=5 format=3 uid="uid://dhnxqwj8uaavf"]
+
+[ext_resource type="Script" path="res://game_manager.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://c4bvxh5y8qqyb" path="res://pin.tscn" id="2_pin"]
+[ext_resource type="PackedScene" uid="uid://c7qh5r3x2mwyk" path="res://scoring_slot.tscn" id="3_slot"]
+[ext_resource type="Script" path="res://ui.gd" id="4_ui"]
+
+[node name="GameManager" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="SpawnPoint" type="Marker2D" parent="."]
+position = Vector2(576, 50)
+
+[node name="Pins" type="Node2D" parent="."]
+
+[node name="Pin_R1_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(576, 150)
+
+[node name="Pin_R2_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(536, 210)
+
+[node name="Pin_R2_1" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(616, 210)
+
+[node name="Pin_R3_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(496, 270)
+
+[node name="Pin_R3_1" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(576, 270)
+
+[node name="Pin_R3_2" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(656, 270)
+
+[node name="Pin_R4_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(456, 330)
+
+[node name="Pin_R4_1" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(536, 330)
+
+[node name="Pin_R4_2" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(616, 330)
+
+[node name="Pin_R4_3" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(696, 330)
+
+[node name="Pin_R5_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(416, 390)
+
+[node name="Pin_R5_1" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(496, 390)
+
+[node name="Pin_R5_2" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(576, 390)
+
+[node name="Pin_R5_3" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(656, 390)
+
+[node name="Pin_R5_4" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(736, 390)
+
+[node name="Pin_R6_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(376, 450)
+
+[node name="Pin_R6_1" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(456, 450)
+
+[node name="Pin_R6_2" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(536, 450)
+
+[node name="Pin_R6_3" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(616, 450)
+
+[node name="Pin_R6_4" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(696, 450)
+
+[node name="Pin_R6_5" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(776, 450)
+
+[node name="Pin_R7_0" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(336, 510)
+
+[node name="Pin_R7_1" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(416, 510)
+
+[node name="Pin_R7_2" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(496, 510)
+
+[node name="Pin_R7_3" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(576, 510)
+
+[node name="Pin_R7_4" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(656, 510)
+
+[node name="Pin_R7_5" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(736, 510)
+
+[node name="Pin_R7_6" parent="Pins" instance=ExtResource("2_pin")]
+position = Vector2(816, 510)
+
+[node name="Slots" type="Node2D" parent="."]
+position = Vector2(0, 580)
+
+[node name="Slot0" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(296, 0)
+slot_number = 0
+
+[node name="Slot1" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(376, 0)
+slot_number = 1
+
+[node name="Slot2" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(456, 0)
+slot_number = 2
+
+[node name="Slot3" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(536, 0)
+slot_number = 3
+
+[node name="Slot4" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(616, 0)
+slot_number = 4
+
+[node name="Slot5" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(696, 0)
+slot_number = 5
+
+[node name="Slot6" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(776, 0)
+slot_number = 6
+
+[node name="Slot7" parent="Slots" instance=ExtResource("3_slot")]
+position = Vector2(856, 0)
+slot_number = 7
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource("4_ui")
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 200.0
+grow_horizontal = 2
+
+[node name="TitleLabel" type="Label" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+text = "Plinko Prototype v0.1 - Physics Validation"
+horizontal_alignment = 1
+
+[node name="InputContainer" type="HBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="BallCountLabel" type="Label" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Balls to Drop:"
+
+[node name="BallCountInput" type="LineEdit" parent="UI/Control/VBoxContainer/InputContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "128"
+placeholder_text = "128"
+
+[node name="DropButton" type="Button" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Drop Balls"
+
+[node name="ResetButton" type="Button" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Reset Statistics"
+
+[node name="TotalLabel" type="Label" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+text = "Total Balls Dropped: 0"
+
+[node name="StatsContainer" type="VBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Stat0" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 0 | Expected: 1/128 (0.8%) | Actual: 0 (0.0%)"
+
+[node name="Stat1" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 1 | Expected: 7/128 (5.5%) | Actual: 0 (0.0%)"
+
+[node name="Stat2" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 2 | Expected: 21/128 (16.4%) | Actual: 0 (0.0%)"
+
+[node name="Stat3" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 3 | Expected: 35/128 (27.3%) | Actual: 0 (0.0%)"
+
+[node name="Stat4" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 4 | Expected: 35/128 (27.3%) | Actual: 0 (0.0%)"
+
+[node name="Stat5" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 5 | Expected: 21/128 (16.4%) | Actual: 0 (0.0%)"
+
+[node name="Stat6" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 6 | Expected: 7/128 (5.5%) | Actual: 0 (0.0%)"
+
+[node name="Stat7" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 7 | Expected: 1/128 (0.8%) | Actual: 0 (0.0%)"
+
+[connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/DropButton" to="." method="_on_drop_button_pressed"]
+[connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/ResetButton" to="." method="_on_reset_button_pressed"]

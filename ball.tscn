@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://dw6m1hqgx8vxo"]
+
+[ext_resource type="Script" path="res://ball.gd" id="1_ball"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
+friction = 0.2
+bounce = 0.6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ball"]
+radius = 8.0
+
+[node name="Ball" type="RigidBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_ball")
+gravity_scale = 1.5
+script = ExtResource("1_ball")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ball")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.3, 0.6, 1, 1)
+scale = Vector2(16, 16)
+texture = preload("res://icon.svg")
