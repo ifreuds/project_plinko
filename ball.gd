@@ -4,9 +4,9 @@ extends RigidBody2D
 # Removed when it enters a scoring slot
 
 func _ready():
-	# Add meaningful random horizontal velocity to break symmetry
-	# Agent calculated: ±50 pixels/s needed for proper 50/50 distribution
-	var random_velocity = randf_range(-50.0, 50.0)
+	# Add controlled random horizontal velocity
+	# Agent recalculated: ±15 px/s ensures first pin hit (±50 caused skipping)
+	var random_velocity = randf_range(-15.0, 15.0)
 	linear_velocity = Vector2(random_velocity, 0)
 
 	# Small rotation adds natural variation
