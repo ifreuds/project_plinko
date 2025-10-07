@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=3 uid="uid://dhnxqwj8uaavf"]
 
-[ext_resource type="Script" path="res://game_manager.gd" id="1_main"]
-[ext_resource type="PackedScene" uid="uid://c4bvxh5y8qqyb" path="res://pin.tscn" id="2_pin"]
+[ext_resource type="Script" uid="uid://bcwxccgo67hdn" path="res://game_manager.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://dbntutjsggajk" path="res://pin.tscn" id="2_pin"]
 [ext_resource type="PackedScene" uid="uid://c7qh5r3x2mwyk" path="res://scoring_slot.tscn" id="3_slot"]
-[ext_resource type="Script" path="res://ui.gd" id="4_ui"]
+[ext_resource type="Script" uid="uid://dgquvncl1qfav" path="res://ui.gd" id="4_ui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
 size = Vector2(20, 700)
@@ -111,7 +111,6 @@ position = Vector2(0, 580)
 
 [node name="Slot0" parent="Slots" instance=ExtResource("3_slot")]
 position = Vector2(296, 0)
-slot_number = 0
 
 [node name="Slot1" parent="Slots" instance=ExtResource("3_slot")]
 position = Vector2(376, 0)
@@ -142,6 +141,8 @@ position = Vector2(856, 0)
 slot_number = 7
 
 [node name="LeftWall" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 1
 position = Vector2(250, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
@@ -152,9 +153,11 @@ offset_left = -10.0
 offset_top = -350.0
 offset_right = 10.0
 offset_bottom = 350.0
-color = Color(0.3, 0.3, 0.3, 1)
+color = Color(0, 0, 0, 1)
 
 [node name="RightWall" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 1
 position = Vector2(900, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
@@ -165,7 +168,7 @@ offset_left = -10.0
 offset_top = -350.0
 offset_right = 10.0
 offset_bottom = 350.0
-color = Color(0.3, 0.3, 0.3, 1)
+color = Color(0, 0, 0, 1)
 
 [node name="UI" type="CanvasLayer" parent="."]
 script = ExtResource("4_ui")

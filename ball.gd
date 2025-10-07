@@ -6,7 +6,7 @@ extends RigidBody2D
 func _ready():
 	# Add microscopic randomness to simulate real-world variations
 	# This ensures each ball takes a unique path through pins
-	var tiny_random = randf_range(-1.0, 1.0)
+	var tiny_random = randf_range(-0.1, 0.1)
 	linear_velocity = Vector2(tiny_random, 0)
 
 	# Tiny rotation helps with pin collision variation
