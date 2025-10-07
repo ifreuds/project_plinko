@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://qt7whkffu0k5" path="res://icon.svg" id="2_41u45"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ktgx5"]
-friction = 0.22
-bounce = 0.60
+friction = 0.40
+bounce = 0.28
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hgol0"]
 radius = 8.0
@@ -13,8 +13,8 @@ radius = 8.0
 [node name="Ball" type="RigidBody2D"]
 collision_mask = 2
 physics_material_override = SubResource("PhysicsMaterial_ktgx5")
-gravity_scale = 0.65
-linear_damp = 0.35
+gravity_scale = 0.5
+linear_damp = 1.0
 angular_damp = 2.0
 script = ExtResource("1_ball")
 
