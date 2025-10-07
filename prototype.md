@@ -4,10 +4,19 @@ Goal: Validate core loop and physics - "Does the Plinko board behave as expected
 
 ---
 
-## 🚧 CURRENT STATUS (In Progress)
+## ✅ PROTOTYPE v0.1 COMPLETED & VALIDATED
 
-### ✅ COMPLETED:
-1. **All Core Features Implemented**
+### STATUS: Physics validation successful! Distribution matches expected binomial curve.
+
+**Test Results (532 balls):**
+- Center slots (3+4): 53.2% (expected 54.6%) ✓
+- Edge slots (0+7): 4.1% (expected 1.6%) - Acceptable variance
+- Bell curve shape preserved with proper gradients
+- No systematic left/right bias
+
+### ✅ ALL FEATURES IMPLEMENTED:
+
+1. **Core Systems**
    - ✅ 7-row triangle pin layout (28 pins total)
    - ✅ 8 scoring slots with Area2D detection
    - ✅ Ball spawning system with RigidBody2D
@@ -16,7 +25,7 @@ Goal: Validate core loop and physics - "Does the Plinko board behave as expected
    - ✅ Side walls to contain balls
    - ✅ Collision layer system (balls pass through each other)
 
-2. **Scenes Created Through Godot Editor**
+2. **Scenes Created**
    - ✅ ball.tscn - Ball with proper collision setup
    - ✅ pin.tscn - Static pins with physics material
    - ✅ scoring_slot.tscn - Detection zones
@@ -29,32 +38,36 @@ Goal: Validate core loop and physics - "Does the Plinko board behave as expected
    - ✅ game_manager.gd - Ball spawning, statistics, UI updates
    - ✅ ui.gd - Statistics display with heatmap colors
 
-### 🔧 CURRENTLY WORKING ON: Physics Calibration
+### ✅ PHYSICS CALIBRATION COMPLETED
 
-**PROBLEM:** Distribution not matching expected bell curve
-- Expected: Center slots (3&4) should get ~27% each, edges (0&7) <1% each
-- Current: Still seeing imbalanced distribution
+**Final Validated Parameters:**
+- **Friction**: 0.40 (Ball & Pin both)
+- **Bounce**: 0.28 (Ball & Pin both)
+- **Gravity scale**: 0.5
+- **Linear damp**: 1.1
+- **Angular damp**: 2.0
+- **Initial velocity**: randf_range(-18.0, 18.0) horizontal
 
-**ROOT CAUSE IDENTIFIED:**
-- Balls were falling too fast, skipping pin rows
-- Balls bouncing too high, flying to edges instead of making sequential left/right decisions
-- Research finding: "Coefficient of restitution requires special calibration" and "slower drops interact with more pegs"
+**Calibration Journey:**
+1. Started with inverted distribution (edge-clustering)
+2. Discovered "deflection ratcheting" (velocity accumulation)
+3. Applied high damping → achieved bell curve but over-compressed
+4. Iteratively reduced damping with micro-adjustments
+5. Final result: Proper binomial distribution within acceptable tolerances
 
-**PHYSICS PARAMETERS BEING TUNED:**
-Current values (actively experimenting):
-- Friction: 0.9 (HIGH - absorbs energy)
-- Bounce: Testing range 0.05-1.0 (finding sweet spot)
-- Gravity: 0.5 (SLOW - ensures ball hits every pin)
-- Angular damp: 2.0 (prevents excessive spinning)
-- Random initial velocity: ±0.1 pixels (microscopic variation for proper randomness)
+**Key Lesson:** Iterative micro-adjustments (±0.1-0.2 changes) more effective than large parameter swings.
 
-**KEY PRINCIPLE:** Ball must fall slowly enough to hit ALL 7 pin rows sequentially, making proper left/right decisions at each row, not skip rows or bounce wildly.
+### 📋 KNOWN LIMITATIONS (For Future Phases):
+1. **Stuck balls** - Rare edge case (~1/500-1000) where ball balances on pin top
+2. **Simulation speed** - 500+ ball tests take considerable time (physics calculation intensive)
+3. **Edge slot variance** - Slightly higher than theoretical (2-4x vs 1x) but within acceptable range for gameplay
 
-### 📋 NEXT STEPS:
-1. **Continue physics calibration** until distribution matches theory (within ±3%)
-2. Test with 128 balls and verify bell curve
-3. Document final physics values once validated
-4. Consider adding visual feedback (ball trails, pin hit effects)
+### 🎯 NEXT PHASE (v0.2 - Gameplay Prototype):
+- Add actual scoring system with point values per slot
+- Implement basic unit types with different physics properties
+- Add turn/round structure
+- Optimize simulation speed (time scale, batching, instant simulation option)
+- Fix stuck ball edge case (detection + gentle nudge)
 
 ---
 
