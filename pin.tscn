@@ -1,22 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://c4bvxh5y8qqyb"]
+[gd_scene load_steps=5 format=3 uid="uid://dbntutjsggajk"]
 
-[ext_resource type="Script" path="res://pin.gd" id="1_pin"]
+[ext_resource type="Script" uid="uid://dd4f580ecns3r" path="res://pin.gd" id="1_pin"]
+[ext_resource type="Texture2D" uid="uid://qt7whkffu0k5" path="res://icon.svg" id="2_gflbs"]
 
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_pin"]
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h4t62"]
 friction = 0.2
-bounce = 0.4
+bounce = 0.2
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_pin"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_sw3mb"]
 radius = 10.0
 
 [node name="Pin" type="StaticBody2D"]
-physics_material_override = SubResource("PhysicsMaterial_pin")
+physics_material_override = SubResource("PhysicsMaterial_h4t62")
 script = ExtResource("1_pin")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_pin")
+shape = SubResource("CircleShape2D_sw3mb")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-modulate = Color(0.8, 0.6, 0.3, 1)
-scale = Vector2(20, 20)
-texture = preload("res://icon.svg")
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_gflbs")
