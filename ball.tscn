@@ -5,15 +5,15 @@
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ktgx5"]
 friction = 0.3
-bounce = 0.1
+bounce = 0.2
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hgol0"]
 radius = 8.0
 
 [node name="Ball" type="RigidBody2D"]
 physics_material_override = SubResource("PhysicsMaterial_ktgx5")
-gravity_scale = 1.0
-linear_damp = 0.5
+gravity_scale = 1.2
+linear_damp = 0.3
 script = ExtResource("1_ball")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
