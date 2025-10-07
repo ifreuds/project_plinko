@@ -2,6 +2,62 @@
 Engine: Godot 4.5
 Goal: Validate core loop and physics - "Does the Plinko board behave as expected mathematically?"
 
+---
+
+## 🚧 CURRENT STATUS (In Progress)
+
+### ✅ COMPLETED:
+1. **All Core Features Implemented**
+   - ✅ 7-row triangle pin layout (28 pins total)
+   - ✅ 8 scoring slots with Area2D detection
+   - ✅ Ball spawning system with RigidBody2D
+   - ✅ Statistics UI showing expected vs actual distribution
+   - ✅ Reset and drop controls working
+   - ✅ Side walls to contain balls
+   - ✅ Collision layer system (balls pass through each other)
+
+2. **Scenes Created Through Godot Editor**
+   - ✅ ball.tscn - Ball with proper collision setup
+   - ✅ pin.tscn - Static pins with physics material
+   - ✅ scoring_slot.tscn - Detection zones
+   - ✅ main.tscn - Complete game board
+
+3. **Scripts Implemented**
+   - ✅ ball.gd - Ball lifecycle and removal
+   - ✅ pin.gd - Pin placeholder (no special behavior needed)
+   - ✅ scoring_slot.gd - Ball detection and counting
+   - ✅ game_manager.gd - Ball spawning, statistics, UI updates
+   - ✅ ui.gd - Statistics display with heatmap colors
+
+### 🔧 CURRENTLY WORKING ON: Physics Calibration
+
+**PROBLEM:** Distribution not matching expected bell curve
+- Expected: Center slots (3&4) should get ~27% each, edges (0&7) <1% each
+- Current: Still seeing imbalanced distribution
+
+**ROOT CAUSE IDENTIFIED:**
+- Balls were falling too fast, skipping pin rows
+- Balls bouncing too high, flying to edges instead of making sequential left/right decisions
+- Research finding: "Coefficient of restitution requires special calibration" and "slower drops interact with more pegs"
+
+**PHYSICS PARAMETERS BEING TUNED:**
+Current values (actively experimenting):
+- Friction: 0.9 (HIGH - absorbs energy)
+- Bounce: Testing range 0.05-1.0 (finding sweet spot)
+- Gravity: 0.5 (SLOW - ensures ball hits every pin)
+- Angular damp: 2.0 (prevents excessive spinning)
+- Random initial velocity: ±0.1 pixels (microscopic variation for proper randomness)
+
+**KEY PRINCIPLE:** Ball must fall slowly enough to hit ALL 7 pin rows sequentially, making proper left/right decisions at each row, not skip rows or bounce wildly.
+
+### 📋 NEXT STEPS:
+1. **Continue physics calibration** until distribution matches theory (within ±3%)
+2. Test with 128 balls and verify bell curve
+3. Document final physics values once validated
+4. Consider adding visual feedback (ball trails, pin hit effects)
+
+---
+
 ## What We're Building (Minimum Viable Prototype)
 
 A testing environment where:
@@ -80,12 +136,22 @@ Display somewhere on screen:
 
 ## Technical Requirements
 
-### Physics Settings Needed:
+### Physics Settings (OUTDATED - See Current Status Above):
+**ORIGINAL ESTIMATES (TOO HIGH - CAUSED INVERTED DISTRIBUTION):**
 - Gravity: Adjust to feel good (start with default)
 - Ball bounce: 0.5-0.8 (needs testing)
 - Ball friction: 0.1-0.3 (needs testing)
 - Pin friction: 0.2 (needs testing)
 - Pin bounce: 0.3-0.5 (needs testing)
+
+**ACTUAL WORKING RANGE (After Research & Testing):**
+- Gravity: 0.5 (much slower than default)
+- Ball bounce: 0.05-1.0 (actively tuning - needs to be LOW)
+- Ball friction: 0.9 (much higher than initial estimate)
+- Pin friction: 0.9 (much higher than initial estimate)
+- Pin bounce: 0.05-0.15 (much lower than initial estimate)
+
+Key lesson: Galton boards need MUCH slower physics than typical games!
 
 ### Key Godot Nodes:
 - Ball: RigidBody2D + CircleShape2D + Sprite2D
