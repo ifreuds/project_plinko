@@ -5,8 +5,8 @@ extends RigidBody2D
 
 func _ready():
 	# Add controlled random horizontal velocity
-	# ±20 px/s: slightly wider than ±15 to help spread, not too wide to skip pins
-	var random_velocity = randf_range(-20.0, 20.0)
+	# ±18 px/s: slight reduction from ±20 to reduce edge spread
+	var random_velocity = randf_range(-18.0, 18.0)
 	linear_velocity = Vector2(random_velocity, 0)
 
 	# Small rotation adds natural variation
