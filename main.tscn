@@ -147,11 +147,25 @@ position = Vector2(250, 300)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
 shape = SubResource("RectangleShape2D_wall")
 
+[node name="ColorRect" type="ColorRect" parent="LeftWall"]
+offset_left = -10.0
+offset_top = -350.0
+offset_right = 10.0
+offset_bottom = 350.0
+color = Color(0.3, 0.3, 0.3, 1)
+
 [node name="RightWall" type="StaticBody2D" parent="."]
 position = Vector2(900, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
 shape = SubResource("RectangleShape2D_wall2")
+
+[node name="ColorRect" type="ColorRect" parent="RightWall"]
+offset_left = -10.0
+offset_top = -350.0
+offset_right = 10.0
+offset_bottom = 350.0
+color = Color(0.3, 0.3, 0.3, 1)
 
 [node name="UI" type="CanvasLayer" parent="."]
 script = ExtResource("4_ui")
