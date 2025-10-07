@@ -5,8 +5,9 @@ extends RigidBody2D
 
 func _ready():
 	# Add controlled random horizontal velocity
-	# Agent recalculated: ±15 px/s ensures first pin hit (±50 caused skipping)
-	var random_velocity = randf_range(-15.0, 15.0)
+	# Agent recalculated: ±60 px/s for proper binomial spread
+	# (Previous ±15 was too conservative, caused center compression)
+	var random_velocity = randf_range(-60.0, 60.0)
 	linear_velocity = Vector2(random_velocity, 0)
 
 	# Small rotation adds natural variation
