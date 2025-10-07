@@ -21,4 +21,3 @@ shape = SubResource("CircleShape2D_ball")
 modulate = Color(0.3, 0.6, 1, 1)
 scale = Vector2(16, 16)
 texture = preload("res://icon.svg")
-
