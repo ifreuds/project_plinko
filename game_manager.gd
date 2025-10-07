@@ -34,7 +34,7 @@ func spawn_ball():
 	add_child(ball)
 	total_balls_dropped += 1
 
-func _on_ball_scored(slot_number):
+func _on_ball_scored(_slot_number):
 	update_ui()
 
 func start_drop_sequence(count: int):
