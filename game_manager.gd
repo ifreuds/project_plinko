@@ -56,3 +56,7 @@ func _on_drop_button_pressed():
 
 func _on_reset_button_pressed():
 	reset_statistics()
+
+func _on_speed_button_pressed(speed: float):
+	Engine.time_scale = speed
+	ui.update_speed_label(speed)

@@ -217,6 +217,37 @@ text = "Drop Balls"
 layout_mode = 2
 text = "Reset Statistics"
 
+[node name="SpeedContainer" type="HBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpeedLabel" type="Label" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "Simulation Speed:"
+
+[node name="Speed1x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "1x"
+
+[node name="Speed2x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "2x"
+
+[node name="Speed4x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "4x"
+
+[node name="Speed8x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "8x"
+
+[node name="Speed16x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "16x"
+
+[node name="CurrentSpeedLabel" type="Label" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = " [Current: 1x]"
+
 [node name="TotalLabel" type="Label" parent="UI/Control/VBoxContainer"]
 layout_mode = 2
 text = "Total Balls Dropped: 0"
@@ -258,3 +289,8 @@ text = "Slot 7 | Expected: 1/128 (0.8%) | Actual: 0 (0.0%)"
 
 [connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/DropButton" to="." method="_on_drop_button_pressed"]
 [connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/ResetButton" to="." method="_on_reset_button_pressed"]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed1x" to="." method="_on_speed_button_pressed" binds= [1.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed2x" to="." method="_on_speed_button_pressed" binds= [2.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed4x" to="." method="_on_speed_button_pressed" binds= [4.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed8x" to="." method="_on_speed_button_pressed" binds= [8.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed16x" to="." method="_on_speed_button_pressed" binds= [16.0]]

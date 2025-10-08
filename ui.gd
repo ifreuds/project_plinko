@@ -5,6 +5,7 @@ extends CanvasLayer
 @onready var reset_button = $Control/VBoxContainer/InputContainer/ResetButton
 @onready var total_label = $Control/VBoxContainer/TotalLabel
 @onready var stats_container = $Control/VBoxContainer/StatsContainer
+@onready var current_speed_label = $Control/VBoxContainer/SpeedContainer/CurrentSpeedLabel
 
 func _ready():
 	ball_count_input.text = "10000"
@@ -38,3 +39,6 @@ func update_statistics(slots, total_dropped, expected_counts):
 		# Color code based on how many balls (heatmap)
 		var intensity = clamp(float(actual_count) / (float(expected_scaled) + 50.0), 0.0, 1.0)
 		stat_label.modulate = Color(1.0, 1.0 - intensity * 0.5, 1.0 - intensity * 0.5)
+
+func update_speed_label(speed: float):
+	current_speed_label.text = " [Current: %dx]" % int(speed)
