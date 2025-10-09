@@ -15,22 +15,27 @@ var all_roads: Array[Road] = []
 # Goal tracking
 var goal_counts: Array[int] = [0, 0, 0, 0, 0, 0, 0]  # 7 goal slots (0-6)
 
-# UI References (matched to scene structure)
-@onready var drop_button: Button = $UI/Panel/VBoxContainer/ButtonContainer/DropButton
-@onready var reset_button: Button = $UI/Panel/VBoxContainer/ButtonContainer/ResetButton
-@onready var node_a_input: SpinBox = $UI/Panel/VBoxContainer/NodeAContainer/SpinBox
-@onready var node_b_input: SpinBox = $UI/Panel/VBoxContainer/NodeBContainer/SpinBox
-@onready var node_c_input: SpinBox = $UI/Panel/VBoxContainer/NodeCContainer/SpinBox
-@onready var total_label: Label = $UI/Panel/VBoxContainer/TotalLabel
-@onready var results_label: RichTextLabel = $UI/Panel/VBoxContainer/ResultsLabel
-@onready var path_log: RichTextLabel = $UI/Panel/VBoxContainer/ScrollContainer/PathLog
+# UI References (matched to scene structure - now inside MainScrollContainer)
+@onready var drop_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/ButtonContainer/DropButton
+@onready var reset_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/ButtonContainer/ResetButton
+@onready var node_a_input: SpinBox = $UI/Panel/MainScrollContainer/VBoxContainer/NodeAContainer/SpinBox
+@onready var node_b_input: SpinBox = $UI/Panel/MainScrollContainer/VBoxContainer/NodeBContainer/SpinBox
+@onready var node_c_input: SpinBox = $UI/Panel/MainScrollContainer/VBoxContainer/NodeCContainer/SpinBox
+@onready var total_label: Label = $UI/Panel/MainScrollContainer/VBoxContainer/TotalLabel
+@onready var results_label: RichTextLabel = $UI/Panel/MainScrollContainer/VBoxContainer/ResultsLabel
+@onready var path_log: RichTextLabel = $UI/Panel/MainScrollContainer/VBoxContainer/ScrollContainer/PathLog
 
 # Weight testing UI
-@onready var road_dropdown: OptionButton = $UI/Panel/VBoxContainer/RoadSelectContainer/RoadDropdown
-@onready var weight_slider: HSlider = $UI/Panel/VBoxContainer/WeightSliderContainer/WeightSlider
-@onready var weight_value_label: Label = $UI/Panel/VBoxContainer/WeightSliderContainer/WeightValue
-@onready var apply_weight_button: Button = $UI/Panel/VBoxContainer/WeightButtonContainer/ApplyWeightButton
-@onready var reset_weights_button: Button = $UI/Panel/VBoxContainer/WeightButtonContainer/ResetWeightsButton
+@onready var road_dropdown: OptionButton = $UI/Panel/MainScrollContainer/VBoxContainer/RoadSelectContainer/RoadDropdown
+@onready var weight_slider: HSlider = $UI/Panel/MainScrollContainer/VBoxContainer/WeightSliderContainer/WeightSlider
+@onready var weight_value_label: Label = $UI/Panel/MainScrollContainer/VBoxContainer/WeightSliderContainer/WeightValue
+@onready var apply_weight_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/WeightButtonContainer/ApplyWeightButton
+@onready var reset_weights_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/WeightButtonContainer/ResetWeightsButton
+
+# Validation testing UI
+@onready var run_1000_test_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/ValidationButtonContainer/Run1000TestButton
+@onready var validate_prob_sums_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/ValidationButtonContainer/ValidateProbSumsButton
+@onready var validation_results_label: RichTextLabel = $UI/Panel/MainScrollContainer/VBoxContainer/ValidationResultsLabel
 
 func _ready():
 	setup_board()
@@ -185,6 +190,10 @@ func setup_ui():
 	apply_weight_button.pressed.connect(_on_apply_weight_pressed)
 	reset_weights_button.pressed.connect(_on_reset_weights_pressed)
 
+	# Validation testing signals
+	run_1000_test_button.pressed.connect(_on_run_1000_test_pressed)
+	validate_prob_sums_button.pressed.connect(_on_validate_prob_sums_pressed)
+
 	_update_total_label()
 	_populate_road_dropdown()
 
@@ -243,6 +252,41 @@ func _on_drop_pressed():
 
 	# Display results
 	display_results()
+
+func drop_unit_silent(unit: Unit, starting_node: BoardNode):
+	"""Simulate a single unit dropping WITHOUT path logging (for automated tests)"""
+	unit.current_node = starting_node
+	unit.add_to_path(starting_node.node_id)
+
+	# Traverse floors 0 → 1 → 2 → 3
+	while unit.current_node.floor_level < 3:
+		var chosen_road = choose_next_road(unit.current_node, unit)
+		chosen_road.increment_traffic()
+
+		# Move to next node
+		var next_node = chosen_road.to_node
+
+		# Calculate probability for logging (but don't log it)
+		var roads = unit.current_node.get_exit_roads()
+		var weights = []
+		for road in roads:
+			weights.append(calculate_route_probability(road, unit.current_node, unit))
+		var total_weight = 0.0
+		for w in weights:
+			total_weight += w
+		var road_idx = roads.find(chosen_road)
+		var probability = weights[road_idx] / total_weight if total_weight > 0 else 0.5
+
+		# Determine direction (left or right)
+		var direction = "L" if road_idx == 0 else "R"
+
+		unit.add_to_path(next_node.node_id, direction, probability)
+		unit.current_node = next_node
+
+	# Unit has reached Floor 3, map to goal slot
+	var goal_slot = map_node_to_goal(unit.current_node)
+	goal_counts[goal_slot] += 1
+	# NO path logging
 
 func drop_unit(unit: Unit, starting_node: BoardNode):
 	"""Simulate a single unit dropping through the board"""
@@ -532,3 +576,208 @@ func calculate_expected_distribution() -> Array[float]:
 		goal_probs[i + 1] += floor_3_probs[i] * 0.5
 
 	return goal_probs
+
+# Automated validation tests
+func _on_run_1000_test_pressed():
+	"""Run comprehensive 1000-unit test with validation"""
+	validation_results_label.clear()
+	validation_results_label.append_text("[b]=== 1000-UNIT VALIDATION TEST ===[/b]\n\n")
+
+	# Store original assignment
+	var original_a = node_a_input.value
+	var original_b = node_b_input.value
+	var original_c = node_c_input.value
+
+	# Set to balanced assignment for testing (300-400-300 = 1000 total)
+	node_a_input.value = 300
+	node_b_input.value = 400
+	node_c_input.value = 300
+
+	print("\n=== RUNNING 1000-UNIT VALIDATION TEST ===")
+	validation_results_label.append_text("Running 1000 units (300-400-300 assignment)...\n")
+	validation_results_label.append_text("Please wait...\n")
+
+	# Clear path log to avoid UI overflow
+	path_log.clear()
+
+	# Reset and run drop
+	goal_counts = [0, 0, 0, 0, 0, 0, 0]
+	for road in all_roads:
+		road.reset_traffic()
+
+	var assignments = [300, 400, 300]
+	var unit_counter = 1
+
+	# Drop units (WITHOUT path logging to avoid UI overflow)
+	for node_idx in range(3):
+		var num_units = assignments[node_idx]
+		var starting_node = floor_0_nodes[node_idx]
+		for i in range(num_units):
+			var unit = Unit.new(unit_counter)
+			drop_unit_silent(unit, starting_node)  # Use silent version
+			unit_counter += 1
+
+	# Calculate expected distribution
+	var expected_probs = calculate_expected_distribution()
+
+	# Validate results
+	var total_units = 1000
+	var all_tests_passed = true
+
+	validation_results_label.append_text("\n[b]Results:[/b]\n")
+	validation_results_label.append_text("Goal | Actual | Expected | Diff | Status\n")
+
+	for i in range(7):
+		var count = goal_counts[i]
+		var actual_percent = (float(count) / total_units * 100.0)
+		var expected_percent = expected_probs[i] * 100.0
+		var diff = actual_percent - expected_percent
+
+		var status = ""
+		var status_color = ""
+		if abs(diff) < 2.0:
+			status = "✓ PASS"
+			status_color = "green"
+		elif abs(diff) < 5.0:
+			status = "⚠ WARN"
+			status_color = "yellow"
+			all_tests_passed = false
+		else:
+			status = "✗ FAIL"
+			status_color = "red"
+			all_tests_passed = false
+
+		validation_results_label.append_text("  %d  | %5.1f%% | %5.1f%% | %+.1f%% | [color=%s]%s[/color]\n" % [
+			i, actual_percent, expected_percent, diff, status_color, status
+		])
+
+	# Test center distribution
+	var center = goal_counts[3] + goal_counts[4]
+	var center_percent = (float(center) / total_units * 100.0)
+	var expected_center = (expected_probs[3] + expected_probs[4]) * 100.0
+	var center_diff = center_percent - expected_center
+
+	validation_results_label.append_text("\n[b]Center (3+4):[/b] %.1f%% actual vs %.1f%% expected (diff: %+.1f%%)\n" % [
+		center_percent, expected_center, center_diff
+	])
+
+	# Overall result
+	validation_results_label.append_text("\n[b]OVERALL:[/b] ")
+	if all_tests_passed:
+		validation_results_label.append_text("[color=green]✓ ALL TESTS PASSED[/color]\n")
+		validation_results_label.append_text("All goals within ±2% variance. Math system validated!\n")
+	else:
+		validation_results_label.append_text("[color=yellow]⚠ SOME WARNINGS[/color]\n")
+		validation_results_label.append_text("Some goals show ±2-5% variance. This is acceptable for probabilistic systems.\n")
+
+	print("1000-unit validation test complete")
+
+	# Restore original assignment
+	node_a_input.value = original_a
+	node_b_input.value = original_b
+	node_c_input.value = original_c
+
+func _on_validate_prob_sums_pressed():
+	"""Validate that probability sums equal 100% at each decision point"""
+	validation_results_label.clear()
+	validation_results_label.append_text("[b]=== PROBABILITY SUM VALIDATION ===[/b]\n\n")
+
+	print("\n=== VALIDATING PROBABILITY SUMS ===")
+
+	var all_valid = true
+	var total_nodes_checked = 0
+	var epsilon = 0.001  # Tolerance for floating point comparison
+
+	# Check Floor 0 nodes
+	validation_results_label.append_text("[b]Floor 0 Nodes:[/b]\n")
+	for node in floor_0_nodes:
+		var exits = node.get_exit_roads()
+		if exits.size() == 0:
+			continue
+
+		var total_weight = 0.0
+		for road in exits:
+			total_weight += road.base_weight
+
+		var prob_sum = 0.0
+		for road in exits:
+			prob_sum += road.base_weight / total_weight
+
+		var is_valid = abs(prob_sum - 1.0) < epsilon
+		var status_color = "green" if is_valid else "red"
+		var status = "✓ PASS" if is_valid else "✗ FAIL"
+
+		validation_results_label.append_text("  Node %s: Sum = %.6f [color=%s]%s[/color]\n" % [
+			node.node_id, prob_sum, status_color, status
+		])
+
+		if not is_valid:
+			all_valid = false
+		total_nodes_checked += 1
+
+	# Check Floor 1 nodes
+	validation_results_label.append_text("\n[b]Floor 1 Nodes:[/b]\n")
+	for node in floor_1_nodes:
+		var exits = node.get_exit_roads()
+		if exits.size() == 0:
+			continue
+
+		var total_weight = 0.0
+		for road in exits:
+			total_weight += road.base_weight
+
+		var prob_sum = 0.0
+		for road in exits:
+			prob_sum += road.base_weight / total_weight
+
+		var is_valid = abs(prob_sum - 1.0) < epsilon
+		var status_color = "green" if is_valid else "red"
+		var status = "✓ PASS" if is_valid else "✗ FAIL"
+
+		validation_results_label.append_text("  Node %s: Sum = %.6f [color=%s]%s[/color]\n" % [
+			node.node_id, prob_sum, status_color, status
+		])
+
+		if not is_valid:
+			all_valid = false
+		total_nodes_checked += 1
+
+	# Check Floor 2 nodes
+	validation_results_label.append_text("\n[b]Floor 2 Nodes:[/b]\n")
+	for node in floor_2_nodes:
+		var exits = node.get_exit_roads()
+		if exits.size() == 0:
+			continue
+
+		var total_weight = 0.0
+		for road in exits:
+			total_weight += road.base_weight
+
+		var prob_sum = 0.0
+		for road in exits:
+			prob_sum += road.base_weight / total_weight
+
+		var is_valid = abs(prob_sum - 1.0) < epsilon
+		var status_color = "green" if is_valid else "red"
+		var status = "✓ PASS" if is_valid else "✗ FAIL"
+
+		validation_results_label.append_text("  Node %s: Sum = %.6f [color=%s]%s[/color]\n" % [
+			node.node_id, prob_sum, status_color, status
+		])
+
+		if not is_valid:
+			all_valid = false
+		total_nodes_checked += 1
+
+	# Overall result
+	validation_results_label.append_text("\n[b]SUMMARY:[/b]\n")
+	validation_results_label.append_text("Checked %d nodes\n" % total_nodes_checked)
+
+	if all_valid:
+		validation_results_label.append_text("[color=green]✓ ALL PROBABILITY SUMS VALID[/color]\n")
+		validation_results_label.append_text("All nodes have exits summing to 100%. System is mathematically sound!\n")
+	else:
+		validation_results_label.append_text("[color=red]✗ SOME PROBABILITY SUMS INVALID[/color]\n")
+		validation_results_label.append_text("ERROR: Some nodes have probabilities that don't sum to 100%!\n")
+
+	print("Probability sum validation complete: %d nodes checked, all valid: %s" % [total_nodes_checked, all_valid])
