@@ -34,6 +34,11 @@ layout_mode = 2
 text = "Prototype 2a - Math System"
 horizontal_alignment = 1
 
+[node name="RoundInfoLabel" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Round 1 | Cumulative Score: 0"
+horizontal_alignment = 1
+
 [node name="HSeparator" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
@@ -122,6 +127,11 @@ size_flags_vertical = 0
 bbcode_enabled = true
 text = "Results will appear here..."
 scroll_following = false
+
+[node name="NextRoundButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Next Round >"
+disabled = true
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2

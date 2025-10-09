@@ -15,9 +15,21 @@ var all_roads: Array[Road] = []
 # Goal tracking
 var goal_counts: Array[int] = [0, 0, 0, 0, 0, 0, 0]  # 7 goal slots (0-6)
 
+# Scoring system (Phase 2b)
+var goal_multipliers: Array[float] = [5.0, 0.0, 1.0, 2.0, 1.0, 0.0, 5.0]  # 7 goal multipliers
+const BASE_POINTS_PER_UNIT: int = 10
+
+# Round system (Phase 2b)
+var current_round: int = 1
+var cumulative_score: int = 0
+var round_scores: Array[int] = []  # Track score for each completed round
+var current_round_score: int = 0  # Score from current drop
+
 # UI References (matched to scene structure - now inside MainScrollContainer)
+@onready var round_info_label: Label = $UI/Panel/MainScrollContainer/VBoxContainer/RoundInfoLabel
 @onready var drop_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/ButtonContainer/DropButton
 @onready var reset_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/ButtonContainer/ResetButton
+@onready var next_round_button: Button = $UI/Panel/MainScrollContainer/VBoxContainer/NextRoundButton
 @onready var node_a_input: SpinBox = $UI/Panel/MainScrollContainer/VBoxContainer/NodeAContainer/SpinBox
 @onready var node_b_input: SpinBox = $UI/Panel/MainScrollContainer/VBoxContainer/NodeBContainer/SpinBox
 @onready var node_c_input: SpinBox = $UI/Panel/MainScrollContainer/VBoxContainer/NodeCContainer/SpinBox
@@ -97,18 +109,40 @@ func setup_board():
 	var goal_y = start_y + floor_spacing_y * 4
 	for i in range(7):
 		var goal = ColorRect.new()
-		goal.size = Vector2(50, 50)
+		goal.size = Vector2(50, 60)  # Slightly taller to fit multiplier
 		goal.position = Vector2(start_x + i * node_spacing_x, goal_y)
-		goal.color = Color(0.8, 0.6, 0.2, 1.0)  # Gold/yellow for goals
 
-		# Add goal number label
+		# Color based on multiplier
+		var multiplier = goal_multipliers[i]
+		if multiplier == 5.0:
+			goal.color = Color(0.0, 1.0, 0.5, 1.0)  # Bright green for 5x (JACKPOT!)
+		elif multiplier == 0.0:
+			goal.color = Color(0.9, 0.1, 0.1, 1.0)  # Red for 0x (BUST!)
+		elif multiplier == 2.0:
+			goal.color = Color(1.0, 0.8, 0.0, 1.0)  # Bright yellow for 2x (good value)
+		else:  # 1x
+			goal.color = Color(0.7, 0.6, 0.3, 1.0)  # Muted gold for 1x (safe)
+
+		# Add goal number label (top part)
 		var label = Label.new()
 		label.text = str(i)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.size = goal.size
-		label.add_theme_font_size_override("font_size", 20)
+		label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		label.position = Vector2(0, 2)
+		label.size = Vector2(goal.size.x, 20)
+		label.add_theme_font_size_override("font_size", 16)
 		goal.add_child(label)
+
+		# Add multiplier label (bottom part)
+		var mult_label = Label.new()
+		mult_label.text = "%.1fx" % multiplier
+		mult_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		mult_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		mult_label.position = Vector2(0, goal.size.y - 22)
+		mult_label.size = Vector2(goal.size.x, 20)
+		mult_label.add_theme_font_size_override("font_size", 12)
+		mult_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))  # White for visibility
+		goal.add_child(mult_label)
 
 		add_child(goal)
 
@@ -180,6 +214,7 @@ func setup_ui():
 	# Connect signals
 	drop_button.pressed.connect(_on_drop_pressed)
 	reset_button.pressed.connect(_on_reset_pressed)
+	next_round_button.pressed.connect(_on_next_round_pressed)
 	node_a_input.value_changed.connect(_on_unit_assignment_changed)
 	node_b_input.value_changed.connect(_on_unit_assignment_changed)
 	node_c_input.value_changed.connect(_on_unit_assignment_changed)
@@ -196,6 +231,7 @@ func setup_ui():
 
 	_update_total_label()
 	_populate_road_dropdown()
+	_update_round_display()
 
 func _on_unit_assignment_changed(_value):
 	"""Update UI when unit assignment changes"""
@@ -384,7 +420,7 @@ func map_node_to_goal(final_node: BoardNode) -> int:
 	return idx + randi_range(0, 1)
 
 func display_results():
-	"""Display goal distribution statistics with expected vs actual"""
+	"""Display goal distribution statistics with expected vs actual and scoring"""
 	var total_units = 0
 	for count in goal_counts:
 		total_units += count
@@ -392,21 +428,33 @@ func display_results():
 	# Calculate expected distribution based on current weights
 	var expected_probs = calculate_expected_distribution()
 
-	var result_text = "\n[b]=== GOAL DISTRIBUTION ===[/b]\n"
+	# Calculate total score for this round
+	current_round_score = calculate_score()
+
+	var result_text = "\n[b]=== ROUND %d RESULTS ===[/b]\n" % current_round
 	result_text += "(%d units dropped)\n\n" % total_units
-	result_text += "[color=gray]Goal | Actual | Expected | Diff[/color]\n"
+	result_text += "[color=gray]Goal | Mult | Units | %    | Score[/color]\n"
 
 	for i in range(7):
 		var count = goal_counts[i]
+		var multiplier = goal_multipliers[i]
 		var actual_percent = (float(count) / total_units * 100.0) if total_units > 0 else 0.0
-		var expected_percent = expected_probs[i] * 100.0
-		var diff = actual_percent - expected_percent
-		var bar = _create_bar(actual_percent)
+		var slot_score = calculate_goal_score(i)
 
-		var diff_color = "green" if abs(diff) < 2.0 else ("yellow" if abs(diff) < 5.0 else "red")
-		result_text += "  %d  | %5.1f%% | %5.1f%% | [color=%s]%+.1f%%[/color] %s\n" % [
-			i, actual_percent, expected_percent, diff_color, diff, bar
+		# Color code multipliers for visual distinction
+		var mult_color = "lime" if multiplier == 5.0 else ("red" if multiplier == 0.0 else ("yellow" if multiplier == 2.0 else "white"))
+
+		result_text += "  %d  | [color=%s]%.1fx[/color] | %3d  | %4.1f%% | [b]%d[/b]\n" % [
+			i, mult_color, multiplier, count, actual_percent, slot_score
 		]
+
+	# Show round score prominently
+	result_text += "\n[color=yellow]═══════════════════════════[/color]\n"
+	result_text += "[b]ROUND SCORE: [color=lime]%d points[/color][/b]\n" % current_round_score
+	result_text += "[color=yellow]═══════════════════════════[/color]\n"
+
+	# Show cumulative progress
+	result_text += "\n[color=cyan]Cumulative: %d points (over %d rounds)[/color]\n" % [cumulative_score, current_round - 1]
 
 	# Calculate center vs edge distribution
 	var center = goal_counts[3] + goal_counts[4]
@@ -416,6 +464,10 @@ func display_results():
 
 	results_label.text = result_text
 	print(result_text)
+
+	# Enable next round button, disable drop button
+	next_round_button.disabled = false
+	drop_button.disabled = true
 
 func _create_bar(percent: float) -> String:
 	"""Create ASCII bar chart"""
@@ -427,6 +479,53 @@ func _create_bar(percent: float) -> String:
 		bar += "░"
 	return "[%s]" % bar
 
+func calculate_score() -> int:
+	"""Calculate total score based on units in each goal slot and their multipliers"""
+	var total_score = 0
+
+	for i in range(7):
+		var units = goal_counts[i]
+		var multiplier = goal_multipliers[i]
+		var slot_score = units * multiplier * BASE_POINTS_PER_UNIT
+		total_score += int(slot_score)
+
+	return total_score
+
+func calculate_goal_score(goal_index: int) -> int:
+	"""Calculate score for a single goal slot"""
+	if goal_index < 0 or goal_index >= 7:
+		return 0
+
+	var units = goal_counts[goal_index]
+	var multiplier = goal_multipliers[goal_index]
+	return int(units * multiplier * BASE_POINTS_PER_UNIT)
+
+func _update_round_display():
+	"""Update the round info label"""
+	round_info_label.text = "Round %d | Cumulative Score: %d" % [current_round, cumulative_score]
+
+func _on_next_round_pressed():
+	"""Handle next round button press - advance to next round"""
+	# Add current round score to cumulative
+	round_scores.append(current_round_score)
+	cumulative_score += current_round_score
+
+	# Advance round
+	current_round += 1
+	current_round_score = 0
+
+	# Update UI
+	_update_round_display()
+
+	# Enable drop button, disable next round button
+	drop_button.disabled = false
+	next_round_button.disabled = true
+
+	# Clear results for next round
+	results_label.text = "Round %d - Ready to drop!" % current_round
+
+	print("Advanced to Round %d (Cumulative: %d points)" % [current_round, cumulative_score])
+
 func _on_reset_pressed():
 	"""Reset all statistics and UI"""
 	goal_counts = [0, 0, 0, 0, 0, 0, 0]
@@ -434,6 +533,18 @@ func _on_reset_pressed():
 		road.reset_traffic()
 	path_log.clear()
 	results_label.text = ""
+
+	# Reset round system
+	current_round = 1
+	cumulative_score = 0
+	round_scores.clear()
+	current_round_score = 0
+	_update_round_display()
+
+	# Reset button states
+	drop_button.disabled = false
+	next_round_button.disabled = true
+
 	print("Reset complete")
 
 # Weight testing functions

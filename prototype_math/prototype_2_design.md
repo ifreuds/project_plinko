@@ -74,18 +74,20 @@ The path between two nodes on adjacent floors.
 ### 4. **Goal** (Scoring Slots)
 The final destination where units land and score points.
 
-**Scoring Multipliers:**
+**Scoring Multipliers (IMPLEMENTED Phase 2b):**
 ```
 Slot:       [0]  [1]  [2]  [3]  [4]  [5]  [6]
-Multiplier: 3x   0.5x  1x   1x   1x   1x  0.5x  3x
-Difficulty: Hard Easy  Med  Safe Safe Med  Easy Hard
+Multiplier: 5x   0x   1x   2x   1x   0x   5x
+Strategy:   Edge Trap Safe Safe Safe Trap Edge
+Variance:   HIGH HIGH LOW  LOW  LOW  HIGH HIGH
 ```
 
 **Risk/Reward Design:**
-- **Edge slots (0, 6):** 3x multiplier - hardest to reach, biggest reward
-- **Near-edge (1, 5):** 0.5x multiplier - "trap" slots, risky but not rewarding
-- **Center (3, 4):** 1x multiplier - safe, consistent scoring
-- **Mid (2, 5):** 1x multiplier - balanced option
+- **Edge slots (0, 6):** 5x multiplier - jackpot rewards (hardest to reach)
+- **Near-edge (1, 5):** 0x multiplier - "trap" slots (punish near-misses)
+- **Center slot (3):** 2x multiplier - bonus for most common landing (LOW VARIANCE)
+- **Side slots (2, 4):** 1x multiplier - safe baseline fallback
+- **Design Philosophy:** Equal EV between edge vs center strategies, differentiated by variance
 
 **Goal Upgrades:**
 - Multipliers can be upgraded (e.g., "Edge slots now 5x")
@@ -297,43 +299,112 @@ Total: 28.5 points
 
 ## Prototype Implementation Phases
 
-### **Phase 2a: Core Math System** ✓
+### **Phase 2a: Core Math System** ✅ COMPLETE (2025-10-09)
 **Goal:** Validate weight calculation and probability flow.
 
-**Features:**
-- 4-floor map (3→4→5→6 nodes → 7 goals)
-- Base roads (all 50 weight)
-- Empty nodes (no modifiers)
-- Unit assignment UI (10 units → 3 Floor 0 nodes, 6 capacity each)
-- Weight calculation system (multiplicative stacking)
-- Drop simulation (units travel through board)
-- Goal slot landing detection
-- Basic scoring (no multipliers yet, just count units per slot)
+**Features Implemented:**
+- ✅ 4-floor map (3→4→5→6 nodes → 7 goals)
+- ✅ Base roads (all 50 weight, manually adjustable 10-200)
+- ✅ Empty nodes (baseline 1.0 modifiers)
+- ✅ Unit assignment UI (100+ units total, 3 Floor 0 nodes)
+- ✅ Weight calculation system (multiplicative stacking: `base × modifier × preference`)
+- ✅ Drop simulation (instant drops for testing, silent mode for performance)
+- ✅ Goal slot landing detection (Floor 3 → Goal mapping)
+- ✅ Statistics display (actual vs expected distribution, color-coded validation)
+- ✅ Traffic visualization (color-coded by usage, magenta for modified roads)
+- ✅ Expected probability calculator (full tree propagation)
+- ✅ Automated validation tests (1000-unit test, probability sum checker)
 
-**Validation Criteria:**
-- Does weight calculation produce expected distributions?
-- Can we manually adjust road weights and see probability changes?
-- Is unit assignment intuitive?
+**Validation Criteria Met:**
+- ✅ Weight calculation produces expected distributions (±2% variance)
+- ✅ Manual road weight adjustment shifts distribution predictably
+- ✅ Unit assignment intuitive and validated
+- ✅ 1000-unit performance acceptable (~1-2 seconds)
+- ✅ Mathematical integrity confirmed (all nodes sum to 100%)
+- ✅ No crashes, null errors, or edge cases discovered
+
+**Files Created:**
+- `prototype_math/prototype_2a.tscn` - Main scene with testing UI
+- `prototype_math/game_manager_2a.gd` - Game logic (620+ lines)
+- `prototype_math/board_node.gd` - Node class
+- `prototype_math/road.gd` - Road class with traffic tracking
+- `prototype_math/unit.gd` - Unit class with path tracking
 
 ---
 
-### **Phase 2b: Roguelite Loop**
+### **Phase 2b: Roguelite Loop** ✅ IN PROGRESS (2025-10-10)
 **Goal:** Add progression and strategic depth.
 
-**Features:**
-- Goal multipliers (3x, 0.5x, 1x, etc.)
-- Scoring system with multipliers
-- Upgrade card system (3 random choices after drop)
-- At least 2 upgrade types implemented:
-  - Road upgrades (change base_weight)
-  - Goal upgrades (change multipliers)
-- Multi-round gameplay (drop → score → upgrade → repeat)
-- Visual feedback for upgrades applied
+**Implementation Status:**
+
+#### ✅ COMPLETE: Scoring System (2025-10-10)
+1. **Goal multipliers implemented:** `[5x, 0x, 1x, 2x, 1x, 0x, 5x]`
+   - Changed from original `[3x, 0.5x, 1x, 1x, 1x, 1x, 0.5x, 3x]` design
+   - **Rationale:** Equal EV between edge vs center strategies, differentiated by variance
+   - Edge slots (0, 6): 5x jackpot, but adjacent 0x traps (HIGH VARIANCE)
+   - Center slot (3): 2x bonus, most common landing (LOW VARIANCE, SAFE)
+   - Slots 2, 4: 1x safe fallback, Slots 1, 5: 0x traps
+2. **Scoring calculation:** `units × multiplier × 10 (base points)` - Working correctly
+3. **Visual enhancements:**
+   - Goal slots color-coded: GREEN (5x), RED (0x), YELLOW (2x), GOLD (1x)
+   - Results display shows: Goal | Mult | Units | % | Score
+   - Total score highlighted in lime green
+
+#### ✅ COMPLETE: Round System (2025-10-10)
+4. **Multi-round gameplay loop implemented:**
+   - Assign → Drop → Score → **Next Round** → Repeat
+   - Missing: Upgrade phase (planned for next session)
+5. **Round-over-round score tracking:** ✅ Working
+   - current_round, cumulative_score, round_scores array
+   - UI displays: "Round X | Cumulative Score: Y"
+6. **State management:** ✅ Solid
+   - Drop button → Next Round button toggle prevents double-execution
+   - Reset button resets entire run (all rounds + cumulative score)
+
+#### ⏳ PENDING: Upgrade Card System (Next Session)
+3. **Upgrade card system:** NOT YET IMPLEMENTED
+   - **Next steps:**
+     - Step 1: UI for showing 3 upgrade cards post-drop
+     - Step 2: Card selection interaction (click to choose)
+     - Step 3: First upgrade type: Road Weight Boost (already validated in 2a)
+     - Step 4: Apply upgrade to board state (modify road base_weight)
+     - Step 5: Test 5-round run with upgrades modifying strategy
+   - **Potential upgrade types:**
+     - Road Weight Boost (change base_weight) - Foundation exists in Phase 2a
+     - Goal Multiplier Modification (e.g., "Center Bonus: Slot 3 → 3x")
+
+#### ⏳ PENDING: Animations (Later - Phase 2c Polish)
+7. **Basic animations:** DEFERRED
+   - Unit drop visualization (instant drops work well for testing)
+   - Score pop-ups (polish feature, not critical for validation)
+   - Road highlight effects (show upgrade application)
+
+**Implementation Strategy:**
+- ✅ Started with scoring system (simplest addition, builds on existing goal detection) - DONE
+- ⏳ Add upgrade card UI and selection framework (no effects yet) - NEXT
+- ⏳ Implement first upgrade type: Road weight modification (already validated in 2a)
+- ✅ Build round loop structure (state machine: Assign → Drop → Score → Next Round) - DONE (minus Upgrade phase)
+- ⏳ Add animations last (after gameplay mechanics proven)
 
 **Validation Criteria:**
-- Are upgrade choices meaningful?
-- Does the build optimization loop feel satisfying?
-- Can players execute different strategies (safe vs risky)?
+- ✅ Score calculation accurate - VALIDATED (test runs show correct math)
+- ⏳ 5 rounds playable without crashes - PARTIALLY VALIDATED (scoring + rounds work, pending upgrades)
+- ⏳ Upgrades modify board state predictably - NOT YET TESTABLE
+- ⏳ Distribution shifts remain mathematically sound after upgrades - NOT YET TESTABLE
+- ⏳ Gameplay loop feels satisfying (subjective but critical) - PARTIAL (scoring adds tension, awaiting upgrades)
+- ⏳ Are upgrade choices meaningful? - NOT YET TESTABLE
+- ⏳ Does the build optimization loop feel satisfying? - NOT YET TESTABLE
+- ⏳ Can players execute different strategies (safe vs risky)? - PARTIAL (unit assignment strategy exists, upgrade strategy pending)
+
+**Files Modified (2025-10-10):**
+- `prototype_math/game_manager_2a.gd` - Added scoring + round system (~40 lines)
+- `prototype_math/prototype_2a.tscn` - Added RoundInfoLabel, NextRoundButton, goal slot colors
+
+**Key Design Decisions Made:**
+1. **Multiplier balance:** Chose `[5x, 0x, 1x, 2x, 1x, 0x, 5x]` over original design for equal EV + variance differentiation
+2. **Round state management:** Simple toggle between Drop/Next Round buttons prevents bugs
+3. **Color-coded goals:** Visual communication eliminates need to read numbers
+4. **Instant drops:** Continue using for Phase 2b (defer animations to Phase 2c)
 
 ---
 

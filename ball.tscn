@@ -1,10 +1,10 @@
 [gd_scene load_steps=5 format=3 uid="uid://b5gy0od542i0w"]
 
 [ext_resource type="Script" uid="uid://b37l8igkgptn2" path="res://ball.gd" id="1_ball"]
-[ext_resource type="Texture2D" uid="uid://qt7whkffu0k5" path="res://icon.svg" id="2_41u45"]
+[ext_resource type="Texture2D" uid="uid://dqeeiy30skj1k" path="res://warrior.png" id="2_41u45"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ktgx5"]
-friction = 0.40
+friction = 0.4
 bounce = 0.28
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hgol0"]
@@ -23,5 +23,5 @@ shape = SubResource("CircleShape2D_hgol0")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(0.58383155, 0.7977378, 1, 1)
-scale = Vector2(0.125, 0.125)
+scale = Vector2(0.05, 0.05)
 texture = ExtResource("2_41u45")

@@ -8,7 +8,8 @@ extends Node2D
 var total_balls_dropped = 0
 var balls_to_drop = 0
 var drop_timer = 0.0
-var drop_interval = 0.1  # Time between ball drops
+var base_drop_interval = 0.1  # Base time between ball drops
+var drop_interval = 0.1  # Current time between ball drops (adjusted by speed)
 
 # Expected probabilities for 7-row board
 var expected_counts = [1, 7, 21, 35, 35, 21, 7, 1]  # Out of 128
@@ -58,5 +59,7 @@ func _on_reset_button_pressed():
 	reset_statistics()
 
 func _on_speed_button_pressed(speed: float):
-	Engine.time_scale = speed
+	# Don't change Engine.time_scale - it breaks physics at high speeds
+	# Instead, spawn balls faster by reducing drop interval
+	drop_interval = base_drop_interval / speed
 	ui.update_speed_label(speed)
