@@ -1,0 +1,185 @@
+[gd_scene load_steps=2 format=3 uid="uid://dv3xh8ykqm2kw"]
+
+[ext_resource type="Script" path="res://prototype_math/game_manager_2a.gd" id="1_2a3b4"]
+
+[node name="GameManager2a" type="Node2D"]
+script = ExtResource("1_2a3b4")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="UI"]
+offset_left = 600.0
+offset_top = 20.0
+offset_right = 980.0
+offset_bottom = 700.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Prototype 2a - Math System"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AssignmentLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Unit Assignment (0-100 per node):"
+
+[node name="NodeAContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/NodeAContainer"]
+layout_mode = 2
+text = "Node A:"
+size_flags_horizontal = 3
+
+[node name="SpinBox" type="SpinBox" parent="UI/Panel/VBoxContainer/NodeAContainer"]
+layout_mode = 2
+max_value = 100.0
+value = 30.0
+
+[node name="NodeBContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/NodeBContainer"]
+layout_mode = 2
+text = "Node B:"
+size_flags_horizontal = 3
+
+[node name="SpinBox" type="SpinBox" parent="UI/Panel/VBoxContainer/NodeBContainer"]
+layout_mode = 2
+max_value = 100.0
+value = 40.0
+
+[node name="NodeCContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/NodeCContainer"]
+layout_mode = 2
+text = "Node C:"
+size_flags_horizontal = 3
+
+[node name="SpinBox" type="SpinBox" parent="UI/Panel/VBoxContainer/NodeCContainer"]
+layout_mode = 2
+max_value = 100.0
+value = 30.0
+
+[node name="TotalLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Total: 100 units"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="LegendLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Road Colors (by traffic volume):
+Gray = 0 units
+Orange = 1-4 units
+Yellow = 5-9 units
+Green = 10+ units"
+
+[node name="HSeparator3" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="DropButton" type="Button" parent="UI/Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Drop Units"
+
+[node name="ResetButton" type="Button" parent="UI/Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reset"
+
+[node name="HSeparator4" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResultsLabel" type="RichTextLabel" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Results will appear here..."
+fit_content = true
+scroll_active = false
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PathLog" type="RichTextLabel" parent="UI/Panel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Path log will appear here..."
+scroll_following = true
+
+[node name="HSeparator5" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="WeightTestLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Manual Weight Testing:"
+
+[node name="RoadSelectContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/RoadSelectContainer"]
+layout_mode = 2
+text = "Road:"
+size_flags_horizontal = 0
+
+[node name="RoadDropdown" type="OptionButton" parent="UI/Panel/VBoxContainer/RoadSelectContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WeightSliderContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/WeightSliderContainer"]
+layout_mode = 2
+text = "Weight:"
+size_flags_horizontal = 0
+
+[node name="WeightSlider" type="HSlider" parent="UI/Panel/VBoxContainer/WeightSliderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 10.0
+max_value = 200.0
+step = 5.0
+value = 50.0
+
+[node name="WeightValue" type="Label" parent="UI/Panel/VBoxContainer/WeightSliderContainer"]
+layout_mode = 2
+text = "50"
+size_flags_horizontal = 0
+
+[node name="WeightButtonContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ApplyWeightButton" type="Button" parent="UI/Panel/VBoxContainer/WeightButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply Weight"
+
+[node name="ResetWeightsButton" type="Button" parent="UI/Panel/VBoxContainer/WeightButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reset All to 50"

@@ -1,0 +1,303 @@
+[gd_scene load_steps=6 format=3 uid="uid://c5jx9k8m4n7q2"]
+
+[ext_resource type="Script" path="res://prototype_math/game_manager_math.gd" id="1_game_manager"]
+[ext_resource type="Script" path="res://prototype_math/ui_math.gd" id="2_ui"]
+[ext_resource type="Texture2D" uid="uid://dxbuxtxcmm2xs" path="res://tower.png" id="3_pin_texture"]
+[ext_resource type="Script" path="res://prototype_math/modifier_ui.gd" id="4_modifier"]
+[ext_resource type="Script" path="res://prototype_math/pin_clickable.gd" id="5_pin_script"]
+
+[node name="GameManagerMath" type="Node2D"]
+script = ExtResource("1_game_manager")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(300, 240)
+
+[node name="PinVisuals" type="Node2D" parent="."]
+
+[node name="Pin_R0_0" type="Sprite2D" parent="PinVisuals"]
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+position = Vector2(300, 100)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_pin_texture")
+script = ExtResource("5_pin_script")
+
+[node name="Pin_R1_0" type="Sprite2D" parent="PinVisuals"]
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+position = Vector2(250, 200)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_pin_texture")
+script = ExtResource("5_pin_script")
+
+[node name="Pin_R1_1" type="Sprite2D" parent="PinVisuals"]
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+position = Vector2(350, 200)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_pin_texture")
+script = ExtResource("5_pin_script")
+
+[node name="Pin_R2_0" type="Sprite2D" parent="PinVisuals"]
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+position = Vector2(200, 300)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_pin_texture")
+script = ExtResource("5_pin_script")
+
+[node name="Pin_R2_1" type="Sprite2D" parent="PinVisuals"]
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+position = Vector2(300, 300)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_pin_texture")
+script = ExtResource("5_pin_script")
+
+[node name="Pin_R2_2" type="Sprite2D" parent="PinVisuals"]
+modulate = Color(0.9063318, 0.7977378, 0.58383155, 1)
+position = Vector2(400, 300)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_pin_texture")
+script = ExtResource("5_pin_script")
+
+[node name="SlotVisuals" type="Node2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource("2_ui")
+
+[node name="ModifierPanel" type="Panel" parent="UI"]
+offset_left = 10.0
+offset_top = 250.0
+offset_right = 110.0
+offset_bottom = 350.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ModifierPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/ModifierPanel/VBoxContainer"]
+layout_mode = 2
+text = "Modifiers"
+horizontal_alignment = 1
+
+[node name="SpawnModifier" type="Button" parent="UI/ModifierPanel/VBoxContainer"]
+custom_minimum_size = Vector2(80, 60)
+layout_mode = 2
+focus_mode = 2
+text = "Spawn +1
+every 4"
+script = ExtResource("4_modifier")
+
+[node name="HelpLabel" type="Label" parent="UI/ModifierPanel"]
+offset_left = 5.0
+offset_top = 75.0
+offset_right = 95.0
+offset_bottom = 95.0
+theme_override_font_sizes/font_size = 9
+text = "Drag to pin
+Right-click pin
+to remove"
+horizontal_alignment = 1
+
+[node name="Slot0Label" type="Label" parent="SlotVisuals"]
+offset_left = 130.0
+offset_top = 410.0
+offset_right = 170.0
+offset_bottom = 430.0
+text = "Slot 0"
+
+[node name="Slot0Count" type="Label" parent="SlotVisuals"]
+offset_left = 140.0
+offset_top = 385.0
+offset_right = 160.0
+offset_bottom = 405.0
+theme_override_font_sizes/font_size = 20
+text = "0"
+
+[node name="Slot1Label" type="Label" parent="SlotVisuals"]
+offset_left = 230.0
+offset_top = 410.0
+offset_right = 270.0
+offset_bottom = 430.0
+text = "Slot 1"
+
+[node name="Slot1Count" type="Label" parent="SlotVisuals"]
+offset_left = 240.0
+offset_top = 385.0
+offset_right = 260.0
+offset_bottom = 405.0
+theme_override_font_sizes/font_size = 20
+text = "0"
+
+[node name="Slot2Label" type="Label" parent="SlotVisuals"]
+offset_left = 330.0
+offset_top = 410.0
+offset_right = 370.0
+offset_bottom = 430.0
+text = "Slot 2"
+
+[node name="Slot2Count" type="Label" parent="SlotVisuals"]
+offset_left = 340.0
+offset_top = 385.0
+offset_right = 360.0
+offset_bottom = 405.0
+theme_override_font_sizes/font_size = 20
+text = "0"
+
+[node name="Slot3Label" type="Label" parent="SlotVisuals"]
+offset_left = 430.0
+offset_top = 410.0
+offset_right = 470.0
+offset_bottom = 430.0
+text = "Slot 3"
+
+[node name="Slot3Count" type="Label" parent="SlotVisuals"]
+offset_left = 440.0
+offset_top = 385.0
+offset_right = 460.0
+offset_bottom = 405.0
+theme_override_font_sizes/font_size = 20
+text = "0"
+
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 200.0
+grow_horizontal = 2
+
+[node name="TitleLabel" type="Label" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+text = "Mathematical Prototype - 3 Rows (Pure Galton Board)"
+horizontal_alignment = 1
+
+[node name="InputContainer" type="HBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="BallCountLabel" type="Label" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Balls to Drop:"
+
+[node name="BallCountInput" type="LineEdit" parent="UI/Control/VBoxContainer/InputContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "1000"
+placeholder_text = "1000"
+
+[node name="DropButton" type="Button" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Drop Balls"
+
+[node name="ResetButton" type="Button" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Reset Statistics"
+
+[node name="ToggleStatsButton" type="Button" parent="UI/Control/VBoxContainer/InputContainer"]
+layout_mode = 2
+text = "Show Pin Stats"
+
+[node name="SpeedContainer" type="HBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpeedLabel" type="Label" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "Animation Speed:"
+
+[node name="Speed1x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "1x"
+
+[node name="Speed2x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "2x"
+
+[node name="Speed5x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "5x"
+
+[node name="Speed10x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "10x"
+
+[node name="Speed20x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "20x"
+
+[node name="Speed50x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "50x"
+
+[node name="Speed100x" type="Button" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = "100x"
+
+[node name="CurrentSpeedLabel" type="Label" parent="UI/Control/VBoxContainer/SpeedContainer"]
+layout_mode = 2
+text = " [Current: 1x]"
+
+[node name="DropSpeedContainer" type="HBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="DropSpeedLabel" type="Label" parent="UI/Control/VBoxContainer/DropSpeedContainer"]
+layout_mode = 2
+text = "Ball Drop Rate:"
+
+[node name="DropSpeedSlider" type="HSlider" parent="UI/Control/VBoxContainer/DropSpeedContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+min_value = 0.01
+max_value = 0.5
+step = 0.01
+value = 0.05
+
+[node name="DropSpeedValueLabel" type="Label" parent="UI/Control/VBoxContainer/DropSpeedContainer"]
+layout_mode = 2
+text = "0.05s"
+
+[node name="TotalLabel" type="Label" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+text = "Total Balls Dropped: 0"
+
+[node name="StatsContainer" type="VBoxContainer" parent="UI/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Stat0" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 0 | Expected: 1/8 (12.5%) | Actual: 0 (0.0%)"
+
+[node name="Stat1" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 1 | Expected: 3/8 (37.5%) | Actual: 0 (0.0%)"
+
+[node name="Stat2" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 2 | Expected: 3/8 (37.5%) | Actual: 0 (0.0%)"
+
+[node name="Stat3" type="Label" parent="UI/Control/VBoxContainer/StatsContainer"]
+layout_mode = 2
+text = "Slot 3 | Expected: 1/8 (12.5%) | Actual: 0 (0.0%)"
+
+[connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/DropButton" to="." method="_on_drop_button_pressed"]
+[connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/ResetButton" to="." method="_on_reset_button_pressed"]
+[connection signal="pressed" from="UI/Control/VBoxContainer/InputContainer/ToggleStatsButton" to="." method="_on_toggle_stats_pressed"]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed1x" to="." method="_on_speed_button_pressed" binds= [1.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed2x" to="." method="_on_speed_button_pressed" binds= [2.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed5x" to="." method="_on_speed_button_pressed" binds= [5.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed10x" to="." method="_on_speed_button_pressed" binds= [10.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed20x" to="." method="_on_speed_button_pressed" binds= [20.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed50x" to="." method="_on_speed_button_pressed" binds= [50.0]]
+[connection signal="pressed" from="UI/Control/VBoxContainer/SpeedContainer/Speed100x" to="." method="_on_speed_button_pressed" binds= [100.0]]
+[connection signal="value_changed" from="UI/Control/VBoxContainer/DropSpeedContainer/DropSpeedSlider" to="." method="_on_drop_speed_changed"]
