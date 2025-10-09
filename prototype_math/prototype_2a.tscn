@@ -29,66 +29,66 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Title" type="Label" parent="UI/Panel/VBoxContainer"]
+[node name="Title" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Prototype 2a - Math System"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="AssignmentLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+[node name="AssignmentLabel" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Unit Assignment (0-100 per node):"
 
-[node name="NodeAContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="NodeAContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/NodeAContainer"]
+[node name="Label" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer/NodeAContainer"]
 layout_mode = 2
 text = "Node A:"
 size_flags_horizontal = 3
 
-[node name="SpinBox" type="SpinBox" parent="UI/Panel/VBoxContainer/NodeAContainer"]
+[node name="SpinBox" type="SpinBox" parent="UI/Panel/MainScrollContainer/VBoxContainer/NodeAContainer"]
 layout_mode = 2
 max_value = 100.0
 value = 30.0
 
-[node name="NodeBContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="NodeBContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/NodeBContainer"]
+[node name="Label" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer/NodeBContainer"]
 layout_mode = 2
 text = "Node B:"
 size_flags_horizontal = 3
 
-[node name="SpinBox" type="SpinBox" parent="UI/Panel/VBoxContainer/NodeBContainer"]
+[node name="SpinBox" type="SpinBox" parent="UI/Panel/MainScrollContainer/VBoxContainer/NodeBContainer"]
 layout_mode = 2
 max_value = 100.0
 value = 40.0
 
-[node name="NodeCContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="NodeCContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/NodeCContainer"]
+[node name="Label" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer/NodeCContainer"]
 layout_mode = 2
 text = "Node C:"
 size_flags_horizontal = 3
 
-[node name="SpinBox" type="SpinBox" parent="UI/Panel/VBoxContainer/NodeCContainer"]
+[node name="SpinBox" type="SpinBox" parent="UI/Panel/MainScrollContainer/VBoxContainer/NodeCContainer"]
 layout_mode = 2
 max_value = 100.0
 value = 30.0
 
-[node name="TotalLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+[node name="TotalLabel" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Total: 100 units"
 horizontal_alignment = 1
 
-[node name="HSeparator2" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="LegendLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+[node name="LegendLabel" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Road Colors (by traffic volume):
 Gray = 0 units
@@ -96,26 +96,26 @@ Orange = 1-4 units
 Yellow = 5-9 units
 Green = 10+ units"
 
-[node name="HSeparator3" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ButtonContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="DropButton" type="Button" parent="UI/Panel/VBoxContainer/ButtonContainer"]
+[node name="DropButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer/ButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Drop Units"
 
-[node name="ResetButton" type="Button" parent="UI/Panel/VBoxContainer/ButtonContainer"]
+[node name="ResetButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer/ButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reset"
 
-[node name="HSeparator4" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+[node name="HSeparator4" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ResultsLabel" type="RichTextLabel" parent="UI/Panel/VBoxContainer"]
+[node name="ResultsLabel" type="RichTextLabel" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 0
@@ -123,12 +123,12 @@ bbcode_enabled = true
 text = "Results will appear here..."
 scroll_following = false
 
-[node name="ScrollContainer" type="ScrollContainer" parent="UI/Panel/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 120)
 size_flags_vertical = 0
 
-[node name="PathLog" type="RichTextLabel" parent="UI/Panel/VBoxContainer/ScrollContainer"]
+[node name="PathLog" type="RichTextLabel" parent="UI/Panel/MainScrollContainer/VBoxContainer/ScrollContainer"]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -137,34 +137,34 @@ text = "Path log will appear here..."
 scroll_following = true
 fit_content = true
 
-[node name="HSeparator5" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+[node name="HSeparator5" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="WeightTestLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+[node name="WeightTestLabel" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Manual Weight Testing:"
 
-[node name="RoadSelectContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="RoadSelectContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/RoadSelectContainer"]
+[node name="Label" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer/RoadSelectContainer"]
 layout_mode = 2
 text = "Road:"
 size_flags_horizontal = 0
 
-[node name="RoadDropdown" type="OptionButton" parent="UI/Panel/VBoxContainer/RoadSelectContainer"]
+[node name="RoadDropdown" type="OptionButton" parent="UI/Panel/MainScrollContainer/VBoxContainer/RoadSelectContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="WeightSliderContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="WeightSliderContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/Panel/VBoxContainer/WeightSliderContainer"]
+[node name="Label" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer/WeightSliderContainer"]
 layout_mode = 2
 text = "Weight:"
 size_flags_horizontal = 0
 
-[node name="WeightSlider" type="HSlider" parent="UI/Panel/VBoxContainer/WeightSliderContainer"]
+[node name="WeightSlider" type="HSlider" parent="UI/Panel/MainScrollContainer/VBoxContainer/WeightSliderContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 10.0
@@ -172,45 +172,45 @@ max_value = 200.0
 step = 5.0
 value = 50.0
 
-[node name="WeightValue" type="Label" parent="UI/Panel/VBoxContainer/WeightSliderContainer"]
+[node name="WeightValue" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer/WeightSliderContainer"]
 layout_mode = 2
 text = "50"
 size_flags_horizontal = 0
 
-[node name="WeightButtonContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="WeightButtonContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ApplyWeightButton" type="Button" parent="UI/Panel/VBoxContainer/WeightButtonContainer"]
+[node name="ApplyWeightButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer/WeightButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Apply Weight"
 
-[node name="ResetWeightsButton" type="Button" parent="UI/Panel/VBoxContainer/WeightButtonContainer"]
+[node name="ResetWeightsButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer/WeightButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reset All to 50"
 
-[node name="HSeparator6" type="HSeparator" parent="UI/Panel/VBoxContainer"]
+[node name="HSeparator6" type="HSeparator" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ValidationLabel" type="Label" parent="UI/Panel/VBoxContainer"]
+[node name="ValidationLabel" type="Label" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Automated Validation Tests:"
 
-[node name="ValidationButtonContainer" type="HBoxContainer" parent="UI/Panel/VBoxContainer"]
+[node name="ValidationButtonContainer" type="HBoxContainer" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Run1000TestButton" type="Button" parent="UI/Panel/VBoxContainer/ValidationButtonContainer"]
+[node name="Run1000TestButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer/ValidationButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Run 1000-Unit Test"
 
-[node name="ValidateProbSumsButton" type="Button" parent="UI/Panel/VBoxContainer/ValidationButtonContainer"]
+[node name="ValidateProbSumsButton" type="Button" parent="UI/Panel/MainScrollContainer/VBoxContainer/ValidationButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Validate Prob Sums"
 
-[node name="ValidationResultsLabel" type="RichTextLabel" parent="UI/Panel/VBoxContainer"]
+[node name="ValidationResultsLabel" type="RichTextLabel" parent="UI/Panel/MainScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 0
