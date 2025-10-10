@@ -380,6 +380,139 @@ These are intentional simplifications - implemented in Phase 2b:
 - Road Weight Boost upgrade already validated in Phase 2a (just needs UI wrapper)
 - Consider second upgrade type: Goal multiplier modification (e.g., "Center Bonus: Slot 3 now 3x")
 
+### Phase 2b: Modular Refactoring Plan (NEXT SESSION)
+
+**Problem Statement:**
+- `game_manager_2a.gd` has grown to 620+ lines (monolithic architecture)
+- Every edit requires reading 200-500 lines of context
+- Context window inefficiency is impacting iteration speed
+- Will worsen when adding upgrade system (~150+ additional lines)
+- Burning token budget on repeated file reads
+
+**Solution: Modular Manager Architecture**
+
+**New File Structure:**
+```
+prototype_math/
+├── game_manager_2a.gd           (COORDINATOR - ~50 lines)
+│   └── Lightweight orchestrator, delegates to managers
+├── managers/
+│   ├── board_manager.gd         (~100 lines)
+│   │   └── Board/road/goal setup, node generation
+│   ├── drop_simulator.gd        (~80 lines)
+│   │   └── Unit pathfinding logic, weighted routing
+│   ├── scoring_manager.gd       (~60 lines)
+│   │   └── Score calculation, multipliers, round scores
+│   ├── round_manager.gd         (~50 lines)
+│   │   └── Round tracking, progression, state flow
+│   ├── validation_manager.gd    (~150 lines)
+│   │   └── Testing tools, probability calculation, automated tests
+│   └── ui_controller.gd         (~100 lines)
+│       └── UI updates, button states, display formatting
+├── board_node.gd                (UNCHANGED)
+├── road.gd                      (UNCHANGED)
+├── unit.gd                      (UNCHANGED)
+└── prototype_2a.tscn            (UNCHANGED)
+```
+
+**Benefits:**
+1. **Context efficiency** - Read 50-150 lines per edit instead of 620+
+2. **Isolated debugging** - Issues contained to specific manager scope
+3. **Easier upgrades** - Add `upgrade_manager.gd` without touching other systems
+4. **Better organization** - Clear separation of concerns (SRP principle)
+5. **Reduced token usage** - Only load relevant manager files during edits
+6. **Parallel development** - Multiple systems can be modified independently
+
+**Implementation Steps (Next Session):**
+1. Create `prototype_math/managers/` directory
+2. Extract scoring logic → `scoring_manager.gd`
+   - Move `goal_multipliers`, `calculate_score()`, score tracking variables
+3. Extract round logic → `round_manager.gd`
+   - Move `current_round`, `cumulative_score`, `round_scores`, round flow
+4. Extract validation → `validation_manager.gd`
+   - Move `calculate_expected_distribution()`, 1000-unit test, probability sum validation
+5. Extract board setup → `board_manager.gd`
+   - Move `setup_board()`, node/road generation, goal slot creation
+6. Extract UI updates → `ui_controller.gd`
+   - Move `update_results_display()`, button state management, label updates
+7. Extract drop simulation → `drop_simulator.gd`
+   - Move `drop_unit()`, `drop_unit_silent()`, pathfinding logic
+8. Convert `game_manager_2a.gd` to thin coordinator
+   - Initialize all managers in `_ready()`
+   - Delegate calls to appropriate managers
+   - Maintain only high-level orchestration logic
+9. Test all functionality (drop, score, rounds, validation)
+10. **THEN** implement upgrade system on clean foundation
+
+**Manager Communication Pattern:**
+```gdscript
+# game_manager_2a.gd (Coordinator)
+var board_mgr: BoardManager
+var drop_mgr: DropSimulator
+var scoring_mgr: ScoringManager
+var round_mgr: RoundManager
+var validation_mgr: ValidationManager
+var ui_ctrl: UIController
+
+func _ready():
+    board_mgr = BoardManager.new()
+    drop_mgr = DropSimulator.new(board_mgr)
+    scoring_mgr = ScoringManager.new()
+    round_mgr = RoundManager.new()
+    # ... initialize managers with cross-dependencies
+
+func _on_drop_button_pressed():
+    drop_mgr.drop_units(assignment_data)
+    var results = scoring_mgr.calculate_score(drop_mgr.goal_distribution)
+    ui_ctrl.update_results(results)
+    round_mgr.complete_round(results.score)
+```
+
+**Estimated Time:** 30-45 minutes
+- Extraction: ~20 minutes
+- Wiring: ~10 minutes
+- Testing: ~10 minutes
+- Validation: ~5 minutes
+
+**Success Criteria:**
+- ✅ All existing functionality works identically (drop, score, rounds, validation)
+- ✅ No crashes or null reference errors
+- ✅ 1000-unit test still passes (validation intact)
+- ✅ Each manager file is <150 lines
+- ✅ `game_manager_2a.gd` reduced to <100 lines (ideally ~50)
+
+**After Refactor:**
+- Upgrade system implementation will be cleaner (add `upgrade_manager.gd`)
+- Each new feature gets its own manager (minimal cross-contamination)
+- Context window usage dramatically reduced (read only relevant files)
+- Iteration speed increases (edit specific managers, not entire system)
+
+**Post-Upgrade Architecture:**
+```
+managers/
+├── board_manager.gd
+├── drop_simulator.gd
+├── scoring_manager.gd
+├── round_manager.gd
+├── validation_manager.gd
+├── ui_controller.gd
+└── upgrade_manager.gd        (NEW - implements card system)
+```
+
+**IMPORTANT: Next Session Workflow**
+1. User requests: "Refactor game_manager_2a into modular architecture"
+2. Knowledge Keeper (you) refers to this plan
+3. Implementation follows steps 1-9 above
+4. After validation passes, THEN proceed with upgrade system
+5. Do NOT skip refactor - foundation is critical for scalability
+
+**Rationale for Refactor-First Approach:**
+- Current 620-line file is already difficult to manage
+- Adding upgrades (~150 lines) would push to 770+ lines (unsustainable)
+- Refactor now = one-time 45-minute cost
+- Skip refactor = compounding context window tax on every future edit
+- Clean foundation enables faster upgrade implementation (paradoxically saves time overall)
+
 ## Architecture Overview
 
 ### Prototype Phase v0.1 (VALIDATED ✓)
