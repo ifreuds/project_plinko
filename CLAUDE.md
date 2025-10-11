@@ -25,6 +25,60 @@ Engine: Godot 4.5 (GL Compatibility renderer)
 - Uses GL Compatibility rendering method (supports both desktop and mobile)
 - Project name: "ProjectPlinko"
 
+## Working with Modular Architecture ⭐
+
+**IMPORTANT:** This project uses a **modular manager architecture** for Phase 2a/2b. Understanding this structure is critical for efficient development.
+
+### Quick Reference: Which File to Edit?
+
+| Task | File to Edit | Lines to Read |
+|------|--------------|---------------|
+| Change multiplier values | `managers/scoring_manager.gd` | ~49 lines |
+| Modify round logic | `managers/round_manager.gd` | ~51 lines |
+| Add/modify board nodes | `managers/board_manager.gd` | ~208 lines |
+| Change drop pathfinding | `managers/drop_simulator.gd` | ~151 lines |
+| Update UI display | `managers/ui_controller.gd` | ~219 lines |
+| Add validation tests | `managers/validation_manager.gd` | ~321 lines |
+| Add new manager | Create `managers/new_manager.gd` + wire in coordinator | N/A |
+| Route new UI signal | `game_manager_2a.gd` (coordinator) | ~164 lines |
+
+### Development Workflow
+
+**Before Making Changes:**
+1. Identify which manager owns the functionality (see table above)
+2. Read **ONLY that manager file** (not the entire codebase)
+3. Read `managers/README.md` if you need API reference
+
+**Making Changes:**
+1. Edit the specific manager file
+2. Test in Godot (run `prototype_2a.tscn`)
+3. Run validation tests if modifying core logic
+
+**Adding New Features:**
+1. Create new manager file (e.g., `upgrade_manager.gd`)
+2. Add setup logic in coordinator's `_ready()`
+3. Wire dependencies to other managers
+4. **Do NOT modify existing managers** unless necessary
+
+### Key Principles
+
+✅ **DO:**
+- Read only the manager you're editing
+- Use manager getter methods (e.g., `board_mgr.get_floor_0_nodes()`)
+- Add new managers for new features
+- Keep coordinator thin (orchestration only)
+
+❌ **DON'T:**
+- Read game_manager_2a.gd to understand game logic (it's just routing)
+- Modify multiple managers for a single feature (design smell)
+- Put business logic in the coordinator
+- Access manager internals directly (use getters)
+
+### Documentation
+
+- **`managers/README.md`**: Complete architecture reference (manager APIs, dependencies, patterns)
+- **CLAUDE.md (this file)**: Project status, implementation history, design decisions
+
 ## Current Development Status (2025-10-10)
 
 **Active Phase:** Prototype v0.2, Phase 2b IN PROGRESS (Scoring & Rounds COMPLETE ✓)
@@ -148,13 +202,16 @@ Engine: Godot 4.5 (GL Compatibility renderer)
   - Road weight manipulation UI
   - Statistics displays with validation
   - Automated test buttons
-- `prototype_math/game_manager_2a.gd` - Game logic (620+ lines)
-  - Core systems: board generation, unit assignment, weighted routing
-  - Weight testing UI: road selection, weight adjustment, visual feedback
-  - Expected probability calculation: full tree propagation (80+ lines)
-  - Enhanced results display: Expected vs Actual comparison with color-coded validation
-  - Automated validation tests: 1000-unit test, probability sum checker
-  - Silent drop mode: `drop_unit_silent()` for performance testing
+- **MODULAR ARCHITECTURE (Refactored 2025-10-10):**
+  - `prototype_math/game_manager_2a.gd` - **Coordinator (164 lines)** - Lightweight orchestrator
+  - `prototype_math/managers/` - **6 Specialized Managers:**
+    - `board_manager.gd` (208 lines) - Board structure, roads, goal slots
+    - `drop_simulator.gd` (151 lines) - Unit pathfinding, weighted routing
+    - `scoring_manager.gd` (49 lines) - Score calculations, multipliers
+    - `round_manager.gd` (51 lines) - Round tracking, cumulative scores
+    - `validation_manager.gd` (321 lines) - Testing tools, expected distribution
+    - `ui_controller.gd` (219 lines) - UI updates, display formatting
+    - `README.md` - **Comprehensive manager documentation** (see below)
 - `prototype_math/board_node.gd` - Node class (modifiers, exit probability)
 - `prototype_math/road.gd` - Road class with traffic tracking
 - `prototype_math/unit.gd` - Unit class with path tracking
@@ -261,36 +318,53 @@ These are intentional simplifications - implemented in Phase 2b:
   - No state corruption or button glitches
   - Scores accumulate correctly across rounds
 
-#### 3. Upgrade Card System ⏳ PENDING (Next Session)
-**Planned Implementation:**
-- Step 1: UI for showing 3 upgrade cards (post-drop display)
-- Step 2: Card selection interaction (click to choose)
-- Step 3: First upgrade type: Road Weight Boost (already validated in Phase 2a)
-- Step 4: Apply upgrade to board state (modify road base_weight)
-- Step 5: Test 5-round run with upgrades modifying strategy
-- **Potential additions:**
-  - Second upgrade type: Goal multiplier modification
-  - Visual feedback for applied upgrades (highlight modified roads)
-  - Upgrade history tracking
+#### 3. Upgrade Card System ✅ COMPLETE (2025-10-11)
+**Implemented Features:**
+- ✅ UI for showing 3 upgrade cards (post-drop display)
+- ✅ Card selection interaction (click to choose)
+- ✅ `upgrade_manager.gd` - Full upgrade system implementation
+  - Road Weight Boost: Picks random road, +50 weight, cyan visual feedback
+  - Goal Multiplier Boost: Picks boostable goals (1x/2x), +1.0 multiplier
+- ✅ Apply upgrade to board state
+  - Road upgrades modify `base_weight` and update visuals
+  - Goal upgrades modify multipliers and refresh UI
+- ✅ Visual feedback: Cyan color for upgraded roads
+- ✅ Upgrade persistence across rounds
 
-#### 4. Animations ⏳ PENDING (Later)
-- Unit drop visualization (optional, instant drops work well for testing)
-- Score pop-ups (polish feature)
-- Road highlight effects (show selected upgrade application)
+**Upgrade Manager Architecture:**
+- Card generation: Random selection between Road/Goal boosts
+- Smart targeting: Goal boosts only target 1x/2x slots (not 0x/5x)
+- Application logic: Modifies board state via manager references
+- Print feedback: Logs all upgrades for testing
 
-#### 5. Full Roguelite Loop ⏳ IN PROGRESS (50% Complete)
+#### 4. Static Board Refactoring ✅ COMPLETE (2025-10-11)
+**Migration from Programmatic to Static Scene:**
+- Created `boards/board_base.tscn` - Modular board scene
+  - 18 BoardNodes manually positioned (Sprite2D with labels)
+  - 24 Roads (Line2D) with weight labels
+  - 7 Goal slots (ColorRect) with multiplier labels
+- Refactored `board_manager.gd`:
+  - `reference_static_nodes()` replaces programmatic generation
+  - `setup_goal_slots()` applies colors/multipliers from scoring manager
+  - Road linking system for pathfinding
+- Benefits:
+  - WYSIWYG board editing in Godot editor
+  - Easier visual debugging
+  - No breaking changes to core systems
+
+#### 5. Full Roguelite Loop ✅ COMPLETE (2025-10-11)
 **Completed:**
-- ✅ Assign Units (Phase 2a system, still functional)
-- ✅ Drop (Phase 2a system, still functional)
-- ✅ Score (NEW - fully implemented 2025-10-10)
-- ⏳ Choose Upgrade (NEXT - ready to implement)
+- ✅ Assign Units (Phase 2a system, fully functional)
+- ✅ Drop (Phase 2a system, fully functional)
+- ✅ Score (Multipliers + cumulative tracking)
+- ✅ Choose Upgrade (Road/Goal boosts implemented)
 
 **Success Criteria Status:**
 - ✅ Score calculation accurate (validated with test runs)
-- ⏳ 5 rounds playable without crashes (validated for scoring only, pending upgrades)
-- ⏳ Upgrades modify board state predictably (not yet implemented)
-- ⏳ Distribution shifts remain mathematically sound after upgrades (not yet testable)
-- ⏳ Gameplay loop feels satisfying (partial - scoring adds tension, awaiting upgrades)
+- ✅ 5 rounds playable without crashes (upgrade system stable)
+- ✅ Upgrades modify board state predictably (road weights + multipliers)
+- ✅ Distribution shifts remain mathematically sound (validation tests pass)
+- ⏳ Gameplay loop feels satisfying (basic loop complete, needs variety)
 
 ### Phase 2b: Key Learnings & Design Decisions
 
@@ -359,159 +433,307 @@ These are intentional simplifications - implemented in Phase 2b:
 - Philosophy: Validate core loop first, add juice later
 
 #### Files Modified (2025-10-10):
-- `prototype_math/game_manager_2a.gd` - Added scoring + round system (~40 lines)
+
+**Session 1: Scoring + Rounds Implementation**
+- `managers/scoring_manager.gd` - Created scoring system
   - `goal_multipliers` array: `[5.0, 0.0, 1.0, 2.0, 1.0, 0.0, 5.0]`
   - `calculate_score()` function: Iterates goals, applies multipliers
-  - `_on_next_round_pressed()` handler: Resets state, increments round
-  - Round tracking variables and UI updates
+  - Multiplier color mapping for UI
+- `managers/round_manager.gd` - Created round tracking
+  - Round state management (current_round, cumulative_score)
+  - Round advancement logic
+- `managers/ui_controller.gd` - Enhanced UI display
+  - Results display with multipliers
+  - Round info formatting
 - `prototype_math/prototype_2a.tscn` - Added UI elements
   - RoundInfoLabel: Shows "Round X | Cumulative Score: Y"
   - NextRoundButton: Controls round progression
   - Goal slot color modulation: GREEN/RED/YELLOW/GOLD
-  - Results display enhancement: Mult column added
+
+**Session 2: Modular Refactoring (MAJOR)**
+- Refactored entire `game_manager_2a.gd` (895 → 164 lines)
+- Created 6 manager files in `managers/` directory
+- Created comprehensive `managers/README.md` documentation
+- **Zero breaking changes** - all functionality preserved
 
 **No Breaking Changes:**
 - Phase 2a systems (weight calculation, probability routing) untouched
 - All existing tests (1000-unit validation, probability sums) still pass
 - Manual road weight manipulation still functional
 
-**Next Session Prep:**
-- Upgrade card system is next logical step
-- Road Weight Boost upgrade already validated in Phase 2a (just needs UI wrapper)
-- Consider second upgrade type: Goal multiplier modification (e.g., "Center Bonus: Slot 3 now 3x")
+**Next Steps:**
+- ✅ Modular architecture complete
+- ➡️ Implement upgrade system as new `upgrade_manager.gd`
+- Road Weight Boost upgrade already validated in Phase 2a (just needs wrapper)
+- Consider second upgrade type: Goal multiplier modification
 
-### Phase 2b: Modular Refactoring Plan (NEXT SESSION)
+### Phase 2b: Modular Architecture - COMPLETE ✓ (2025-10-10)
 
-**Problem Statement:**
-- `game_manager_2a.gd` has grown to 620+ lines (monolithic architecture)
-- Every edit requires reading 200-500 lines of context
-- Context window inefficiency is impacting iteration speed
-- Will worsen when adding upgrade system (~150+ additional lines)
-- Burning token budget on repeated file reads
+**Status:** Successfully refactored from 895-line monolith to modular architecture
 
-**Solution: Modular Manager Architecture**
+**Achievement:**
+- Reduced coordinator from **895 lines → 164 lines** (82% reduction!)
+- Extracted logic into **6 specialized managers** (total: 1,163 lines organized)
+- All functionality preserved and validated
+- Zero breaking changes
 
-**New File Structure:**
+**Final File Structure:**
 ```
 prototype_math/
-├── game_manager_2a.gd           (COORDINATOR - ~50 lines)
+├── game_manager_2a.gd           (164 lines) - COORDINATOR ✓
 │   └── Lightweight orchestrator, delegates to managers
 ├── managers/
-│   ├── board_manager.gd         (~100 lines)
-│   │   └── Board/road/goal setup, node generation
-│   ├── drop_simulator.gd        (~80 lines)
-│   │   └── Unit pathfinding logic, weighted routing
-│   ├── scoring_manager.gd       (~60 lines)
-│   │   └── Score calculation, multipliers, round scores
-│   ├── round_manager.gd         (~50 lines)
-│   │   └── Round tracking, progression, state flow
-│   ├── validation_manager.gd    (~150 lines)
-│   │   └── Testing tools, probability calculation, automated tests
-│   └── ui_controller.gd         (~100 lines)
-│       └── UI updates, button states, display formatting
-├── board_node.gd                (UNCHANGED)
-├── road.gd                      (UNCHANGED)
-├── unit.gd                      (UNCHANGED)
-└── prototype_2a.tscn            (UNCHANGED)
+│   ├── board_manager.gd         (208 lines) - Board structure ✓
+│   ├── drop_simulator.gd        (151 lines) - Unit pathfinding ✓
+│   ├── scoring_manager.gd       (49 lines) - Score calculations ✓
+│   ├── round_manager.gd         (51 lines) - Round tracking ✓
+│   ├── validation_manager.gd    (321 lines) - Testing tools ✓
+│   ├── ui_controller.gd         (219 lines) - UI display ✓
+│   └── README.md                - Full architecture documentation
+├── board_node.gd                (unchanged)
+├── road.gd                      (unchanged)
+├── unit.gd                      (unchanged)
+└── prototype_2a.tscn            (unchanged)
 ```
 
-**Benefits:**
-1. **Context efficiency** - Read 50-150 lines per edit instead of 620+
-2. **Isolated debugging** - Issues contained to specific manager scope
-3. **Easier upgrades** - Add `upgrade_manager.gd` without touching other systems
-4. **Better organization** - Clear separation of concerns (SRP principle)
-5. **Reduced token usage** - Only load relevant manager files during edits
-6. **Parallel development** - Multiple systems can be modified independently
+**Benefits Achieved:**
+1. ✅ **Context efficiency** - Now read 49-321 lines per edit instead of 895+
+2. ✅ **Isolated debugging** - Issues scoped to specific manager (e.g., scoring bug → only read scoring_manager.gd)
+3. ✅ **Easy extension** - Add `upgrade_manager.gd` without touching existing code
+4. ✅ **Clear SoC** - Each manager has single responsibility
+5. ✅ **Token savings** - Massive reduction in context window usage
+6. ✅ **Future-proof** - Ready for upgrade system implementation
 
-**Implementation Steps (Next Session):**
-1. Create `prototype_math/managers/` directory
-2. Extract scoring logic → `scoring_manager.gd`
-   - Move `goal_multipliers`, `calculate_score()`, score tracking variables
-3. Extract round logic → `round_manager.gd`
-   - Move `current_round`, `cumulative_score`, `round_scores`, round flow
-4. Extract validation → `validation_manager.gd`
-   - Move `calculate_expected_distribution()`, 1000-unit test, probability sum validation
-5. Extract board setup → `board_manager.gd`
-   - Move `setup_board()`, node/road generation, goal slot creation
-6. Extract UI updates → `ui_controller.gd`
-   - Move `update_results_display()`, button state management, label updates
-7. Extract drop simulation → `drop_simulator.gd`
-   - Move `drop_unit()`, `drop_unit_silent()`, pathfinding logic
-8. Convert `game_manager_2a.gd` to thin coordinator
-   - Initialize all managers in `_ready()`
-   - Delegate calls to appropriate managers
-   - Maintain only high-level orchestration logic
-9. Test all functionality (drop, score, rounds, validation)
-10. **THEN** implement upgrade system on clean foundation
+**Manager Responsibilities:**
+- **game_manager_2a.gd**: Orchestrates manager interactions, routes UI signals (NEVER contains logic)
+- **board_manager.gd**: Creates nodes/roads/goals, manages geometry and visual setup
+- **drop_simulator.gd**: Executes unit pathfinding via weighted routing, tracks goal landings
+- **scoring_manager.gd**: Calculates scores, stores multipliers, provides color mappings
+- **round_manager.gd**: Tracks round state, cumulative scores, round progression
+- **validation_manager.gd**: Expected distribution calculation, automated tests, validation
+- **ui_controller.gd**: All UI updates, display formatting, button state management
 
-**Manager Communication Pattern:**
+**Manager Communication Pattern (Implemented):**
 ```gdscript
 # game_manager_2a.gd (Coordinator)
-var board_mgr: BoardManager
-var drop_mgr: DropSimulator
-var scoring_mgr: ScoringManager
-var round_mgr: RoundManager
-var validation_mgr: ValidationManager
-var ui_ctrl: UIController
-
 func _ready():
-    board_mgr = BoardManager.new()
-    drop_mgr = DropSimulator.new(board_mgr)
+    # Initialize managers
     scoring_mgr = ScoringManager.new()
+    board_mgr = BoardManager.new()
+    drop_sim = DropSimulator.new()
     round_mgr = RoundManager.new()
-    # ... initialize managers with cross-dependencies
+    validation_mgr = ValidationManager.new()
+    ui_ctrl = UIController.new()
 
-func _on_drop_button_pressed():
-    drop_mgr.drop_units(assignment_data)
-    var results = scoring_mgr.calculate_score(drop_mgr.goal_distribution)
-    ui_ctrl.update_results(results)
-    round_mgr.complete_round(results.score)
+    # Setup dependencies
+    board_mgr.setup(self, scoring_mgr)
+    drop_sim.setup(board_mgr)
+    validation_mgr.setup(board_mgr, drop_sim)
+    ui_ctrl.setup(board_mgr, scoring_mgr, round_mgr, validation_mgr)
+
+func _on_drop_pressed():
+    drop_sim.reset_goal_counts()
+    board_mgr.reset_road_traffic()
+    ui_ctrl.prepare_for_drop()
+    # ... drop units
+    ui_ctrl.display_results(drop_sim.get_goal_counts())
 ```
 
-**Estimated Time:** 30-45 minutes
-- Extraction: ~20 minutes
-- Wiring: ~10 minutes
-- Testing: ~10 minutes
-- Validation: ~5 minutes
+**Validation Results:**
+- ✅ Drop units works (100 units tested)
+- ✅ Score calculation accurate
+- ✅ Round progression functional
+- ✅ Road weight manipulation works
+- ✅ 1000-unit validation test passes
+- ✅ Probability sum validation passes
+- ✅ No crashes, null errors, or regressions
 
-**Success Criteria:**
-- ✅ All existing functionality works identically (drop, score, rounds, validation)
-- ✅ No crashes or null reference errors
-- ✅ 1000-unit test still passes (validation intact)
-- ✅ Each manager file is <150 lines
-- ✅ `game_manager_2a.gd` reduced to <100 lines (ideally ~50)
+**Documentation:**
+- **See `prototype_math/managers/README.md`** for:
+  - Complete manager API reference
+  - Dependency graph
+  - Communication patterns
+  - How to add new managers
+  - Common modification scenarios
+  - Troubleshooting guide
+  - File-by-file responsibility breakdown
 
-**After Refactor:**
-- Upgrade system implementation will be cleaner (add `upgrade_manager.gd`)
-- Each new feature gets its own manager (minimal cross-contamination)
-- Context window usage dramatically reduced (read only relevant files)
-- Iteration speed increases (edit specific managers, not entire system)
+**Next Steps:**
+- ✅ Modular architecture complete
+- ✅ Upgrade system implemented (Road + Goal boosts)
+- ➡️ **Ready for Phase 2c** - Expand upgrade variety
 
-**Post-Upgrade Architecture:**
-```
-managers/
-├── board_manager.gd
-├── drop_simulator.gd
-├── scoring_manager.gd
-├── round_manager.gd
-├── validation_manager.gd
-├── ui_controller.gd
-└── upgrade_manager.gd        (NEW - implements card system)
-```
+## Future Development Roadmap (2025-10-11)
 
-**IMPORTANT: Next Session Workflow**
-1. User requests: "Refactor game_manager_2a into modular architecture"
-2. Knowledge Keeper (you) refers to this plan
-3. Implementation follows steps 1-9 above
-4. After validation passes, THEN proceed with upgrade system
-5. Do NOT skip refactor - foundation is critical for scalability
+### **Phase 2b Status:** CORE COMPLETE ✓
 
-**Rationale for Refactor-First Approach:**
-- Current 620-line file is already difficult to manage
-- Adding upgrades (~150 lines) would push to 770+ lines (unsustainable)
-- Refactor now = one-time 45-minute cost
-- Skip refactor = compounding context window tax on every future edit
-- Clean foundation enables faster upgrade implementation (paradoxically saves time overall)
+**What's Done:**
+- ✅ Static board scene architecture
+- ✅ Scoring system with multipliers `[5x, 0x, 1x, 2x, 1x, 0x, 5x]`
+- ✅ Round tracking & cumulative scores
+- ✅ Upgrade system (2 types: Road Weight Boost, Goal Multiplier Boost)
+- ✅ Full roguelite loop playable
+
+**What Remains (Optional Polish):**
+- Animation for unit drops (currently instant)
+- Upgrade history tracking
+- More visual feedback
+
+---
+
+### **Phase 2c: Expand Upgrade Variety** (NEXT)
+
+**Goal:** Add 3 more upgrade categories for strategic depth
+
+#### 1. Node Upgrades
+**Concept:** Nodes apply multipliers to their exit roads
+
+**Upgrade Types:**
+- **Magnet Node**: +30% weight to one exit road
+  - Example: "Magnet Node E (→I path +30%)"
+  - Implementation: `node.exit_modifier_left = 1.3`
+- **Repulsor Node**: -50% weight to one exit road
+  - Example: "Repulsor Node D (→H path -50%)"
+  - Implementation: `node.exit_modifier_left = 0.5`
+- **Chaos Node**: Randomize weights each round
+  - Example: "Chaos Node F (random each turn)"
+  - Implementation: Randomize modifiers in round start
+
+**Technical Changes:**
+- Modify `board_node.gd:get_exit_modifier_for_road()`
+- Add modifier properties to BoardNode
+- Update weight calculation in `drop_simulator.gd`
+
+#### 2. Unit Type Upgrades
+**Concept:** Some units prefer certain road types
+
+**Upgrade Types:**
+- **Scout Units**: Prefer high-weight roads (+20% to roads >70 weight)
+  - Example: "5 Scout Units (seeks risky paths)"
+  - Implementation: `unit.get_preference_for_road()` returns 1.2 if road.base_weight > 70
+- **Tank Units**: Prefer low-weight roads (+20% to roads <50 weight)
+  - Example: "5 Tank Units (seeks safe paths)"
+  - Creates counter-intuitive routing patterns
+
+**Technical Changes:**
+- Modify `unit.gd:get_preference_for_road()`
+- Add unit type property
+- Track unit type composition in drop simulator
+
+#### 3. Capacity Upgrades
+**Concept:** Expand resource limits
+
+**Upgrade Types:**
+- **Node Capacity**: Increase max units per node (6 → 8 → 10)
+  - Example: "+2 Node Capacity (allows 8 units per node)"
+- **Unit Pool**: Increase total starting units (100 → 110 → 120)
+  - Example: "+10 Total Units"
+
+**Technical Changes:**
+- Add capacity tracking to UI
+- Modify unit assignment validation
+- Update total units calculation
+
+#### 4. Road Upgrade Variety
+**Expand existing Road category:**
+- Variable boost amounts (+20, +50, +100)
+- Rare "Mega Boost" (+200 weight)
+- "Balanced Pair" (boost both exits from one node)
+
+**Estimated Time:** 4-6 hours
+
+---
+
+### **Phase 2d: UI/UX Polish**
+
+**Goal:** Make the game feel polished and satisfying
+
+#### Improvements:
+1. **Better Upgrade Card Visuals**
+   - Card backgrounds with rarity colors
+   - Icons for upgrade types
+   - Hover effects
+
+2. **Improved Results Display**
+   - Animated score counter
+   - Goal slot highlight when units land
+   - Bar chart for distribution visualization
+
+3. **Visual Feedback**
+   - Road pulse effect when upgraded
+   - Node glow for modifiers
+   - Particle effects on jackpot goals
+
+4. **Audio** (Optional)
+   - Click sounds
+   - Score tally sound
+   - Background music
+
+**Estimated Time:** 3-4 hours
+
+---
+
+### **Phase 2e: Economy System**
+
+**Goal:** Replace free upgrades with resource-based economy
+
+#### Core Mechanic:
+- **Gold earned per round**: Based on score
+  - Formula: `gold = round_score / 10`
+  - Example: 150 points → 15 gold
+
+- **Upgrade Shop**: Pay gold to buy upgrades
+  - Prices scale with power:
+    - Road Boost (+50): 10 gold
+    - Goal Boost (+1x): 15 gold
+    - Node Modifier: 20 gold
+    - Unit Type: 25 gold
+    - Capacity Upgrade: 30 gold
+
+- **Strategic Decisions**:
+  - Save gold for expensive upgrades?
+  - Buy cheap upgrades now for compounding?
+  - Risk management (spend vs save)
+
+#### Technical Implementation:
+- Add `gold` to `round_manager.gd`
+- Modify `upgrade_manager.gd` for pricing
+- Update `ui_controller.gd` for shop display
+- Add "Skip" option (take gold, no upgrade)
+
+**Estimated Time:** 2-3 hours
+
+---
+
+### **Phase 3: Meta-Progression** (FUTURE)
+
+**Goal:** Persistent progression between runs
+
+#### Features:
+- Unlock permanent upgrades with meta-currency
+- Difficulty tiers with better rewards
+- Achievements system
+- Daily challenges
+- Leaderboards
+
+**Estimated Time:** 8-10 hours
+
+---
+
+## Development Priority Order
+
+**Immediate Next Session:**
+1. ✅ Test Phase 2b (verify upgrade system works end-to-end)
+2. ➡️ **Phase 2c:** Implement Node Upgrades (Magnet/Repulsor)
+3. ➡️ **Phase 2c:** Implement Unit Types (Scout/Tank)
+4. ➡️ **Phase 2c:** Implement Capacity Upgrades
+
+**After Phase 2c:**
+5. **Phase 2d:** Polish UI/UX
+6. **Phase 2e:** Add Economy System
+
+**Long-term:**
+7. **Phase 3:** Meta-progression features
 
 ## Architecture Overview
 

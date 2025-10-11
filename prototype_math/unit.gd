@@ -12,7 +12,7 @@ var path_details: Array[String] = []  # Track full details: ["A → D(L,58%)", "
 func _init(id: int):
 	unit_id = id
 
-func get_preference_for_road(road: Road) -> float:
+func get_preference_for_road(_road: Road) -> float:
 	# For Phase 2a: no preferences, always return 1.0
 	# Phase 2b will add unit types like "Scout" (prefers risky) or "Tank" (prefers safe)
 	return 1.0
